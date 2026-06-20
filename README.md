@@ -3,11 +3,11 @@
 Este repositório contém as configurações e manifestos de infraestrutura necessários para orquestrar e executar os microsserviços do projeto **FCG (FIAP Cloud Games)**.
 
 O projeto é composto por 5 microsserviços desenvolvidos em **.NET 10**:
-1. **UsersAPI**: Gerenciamento de usuários.
-2. **CatalogAPI**: Catálogo de jogos e início do fluxo de compra.
-3. **PaymentsAPI**: Processamento de pagamentos das compras.
+1. **Users**: Gerenciamento de usuários.
+2. **Catalog**: Catálogo de jogos e início do fluxo de compra.
+3. **Payments**: Worker de background para processamento de pagamentos das compras.
 4. **CatalogWorkerService**: Worker de background para processamento de respostas de pagamentos e persistência de bibliotecas de jogos.
-5. **NotificationsAPI**: Envio de notificações e e-mails transacionais.
+5. **Notifications**: Worker de background para envio de notificações e e-mails transacionais.
 
 ---
 
@@ -45,11 +45,9 @@ O arquivo `docker-compose.yml` na raiz sobe os cinco microsserviços juntamente 
 ### Endereços Locais Importantes:
 *   **RabbitMQ Management UI**: [http://localhost:15672](http://localhost:15672) (Usuário: `fcg_user` | Senha: `fcg_password`)
 *   **PostgreSQL**: `localhost:5432` (Usuário: `fcg_user` | Senha: `fcg_password`)
-*   **UsersAPI**: `http://localhost:8081`
-*   **CatalogAPI**: `http://localhost:8082`
-*   **PaymentsAPI**: `http://localhost:8083`
-*   **NotificationsAPI**: `http://localhost:8084`
-*   *Nota: O `CatalogWorkerService` roda como background worker e não expõe portas HTTP de forma padrão.*
+*   **Users**: `http://localhost:8081`
+*   **Catalog**: `http://localhost:8082`
+*   *Nota: Os workers `CatalogWorkerService`, `Payments` e `Notifications` rodam como background workers e não expõem portas HTTP de forma padrão.*
 
 ---
 
@@ -90,10 +88,10 @@ As seguintes variáveis de ambiente configuram a comunicação dos microsserviç
 
 | Serviço | Nome da Variável | Descrição | Exemplo de Valor |
 | :--- | :--- | :--- | :--- |
-| **UsersAPI** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `users` | `Host=postgres;Database=users;Username=fcg_user;Password=fcg_password` |
+| **Users** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `users` | `Host=postgres;Database=users;Username=fcg_user;Password=fcg_password` |
 | **CatalogWorkerService** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `library` | `Host=postgres;Database=library;Username=fcg_user;Password=fcg_password` |
-| **CatalogAPI** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `catalog` | `Host=postgres;Database=catalog;Username=fcg_user;Password=fcg_password` |
-| **PaymentsAPI** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `payments` | `Host=postgres;Database=payments;Username=fcg_user;Password=fcg_password` |
-| **NotificationsAPI** | *Nenhum banco de dados configurado* | Consome eventos RabbitMQ apenas | - |
+| **Catalog** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `catalog` | `Host=postgres;Database=catalog;Username=fcg_user;Password=fcg_password` |
+| **Payments** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `payments` | `Host=postgres;Database=payments;Username=fcg_user;Password=fcg_password` |
+| **Notifications** | *Nenhum banco de dados configurado* | Consome eventos RabbitMQ apenas | - |
 
 *(Nota: No ambiente Kubernetes, as connection strings e as credenciais sensíveis devem ser injetadas a partir das referências aos Secrets `postgres-secret` e `rabbitmq-secret` definidos nos manifestos).*

@@ -37,9 +37,9 @@ services:
     networks:
       - fcg-network
 
-  users-api:
+  users:
     image: [IMAGEM_DOCKER_HUB]
-    container_name: fcg-users-api
+    container_name: fcg-users
     ports:
       - "8081:8080"
     environment:
@@ -73,9 +73,9 @@ services:
     networks:
       - fcg-network
 
-  catalog-api:
+  catalog:
     image: [IMAGEM_DOCKER_HUB]
-    container_name: fcg-catalog-api
+    container_name: fcg-catalog
     ports:
       - "8082:8080"
     environment:
@@ -92,11 +92,9 @@ services:
     networks:
       - fcg-network
 
-  payments-api:
+  payments:
     image: [IMAGEM_DOCKER_HUB]
-    container_name: fcg-payments-api
-    ports:
-      - "8083:8080"
+    container_name: fcg-payments
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Database=payments;Username=fcg_user;Password=fcg_password
@@ -111,11 +109,9 @@ services:
     networks:
       - fcg-network
 
-  notifications-api:
+  notifications:
     image: [IMAGEM_DOCKER_HUB]
-    container_name: fcg-notifications-api
-    ports:
-      - "8084:8080"
+    container_name: fcg-notifications
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - RabbitMQ__Host=rabbitmq
