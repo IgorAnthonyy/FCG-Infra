@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: fcg-postgres
+    environment:
+      POSTGRES_USER: fcg_user
+      POSTGRES_PASSWORD: fcg_password
+      POSTGRES_DB: fcg_main
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fcg_user -d fcg_main"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fcg-network
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: fcg-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: fcg_user
+      RABBITMQ_DEFAULT_PASS: fcg_password
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fcg-network
+
+  users-api:
+    image: [IMAGEM_DOCKER_HUB]
+    container_name: fcg-users-api
+    ports:
+      - "8081:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=users;Username=fcg_user;Password=fcg_password
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=fcg_user
+      - RabbitMQ__Password=fcg_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - fcg-network
+
+  catalog-worker-service:
+    image: [IMAGEM_DOCKER_HUB]
+    container_name: fcg-catalog-worker-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=library;Username=fcg_user;Password=fcg_password
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=fcg_user
+      - RabbitMQ__Password=fcg_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - fcg-network
+
+  catalog-api:
+    image: [IMAGEM_DOCKER_HUB]
+    container_name: fcg-catalog-api
+    ports:
+      - "8082:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=catalog;Username=fcg_user;Password=fcg_password
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=fcg_user
+      - RabbitMQ__Password=fcg_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - fcg-network
+
+  payments-api:
+    image: [IMAGEM_DOCKER_HUB]
+    container_name: fcg-payments-api
+    ports:
+      - "8083:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=payments;Username=fcg_user;Password=fcg_password
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=fcg_user
+      - RabbitMQ__Password=fcg_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - fcg-network
+
+  notifications-api:
+    image: [IMAGEM_DOCKER_HUB]
+    container_name: fcg-notifications-api
+    ports:
+      - "8084:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=fcg_user
+      - RabbitMQ__Password=fcg_password
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - fcg-network
+
+volumes:
+  postgres_data:
+
+networks:
+  fcg-network:
+    driver: bridge
