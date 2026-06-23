@@ -38,7 +38,7 @@ services:
       - fcg-network
 
   users:
-    image: [IMAGEM_DOCKER_HUB]
+    image: igoranthony12/users-api:latest
     container_name: fcg-users
     ports:
       - "8081:8080"

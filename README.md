@@ -35,12 +35,11 @@ Para rodar a infraestrutura localmente, você precisará ter instalado:
 O arquivo `docker-compose.yml` na raiz sobe os cinco microsserviços juntamente com o banco de dados PostgreSQL e o RabbitMQ pré-configurados.
 
 ### Passos para Iniciar
-1. Certifique-se de configurar a imagem correta do Docker Hub (`[IMAGEM_DOCKER_HUB]`) para cada um dos microsserviços no arquivo `docker-compose.yml`.
-2. Execute o comando na raiz do repositório:
+1. Execute o comando na raiz do repositório:
    ```bash
    docker-compose up -d
    ```
-3. Os bancos de dados (`users`, `library`, `catalog`, `payments`) serão criados e migrados automaticamente pelos próprios microsserviços (.NET migrations) em sua inicialização.
+2. Os bancos de dados (`users`, `library`, `catalog`, `payments`) serão criados e migrados automaticamente pelos próprios microsserviços (.NET migrations) em sua inicialização.
 
 ### Endereços Locais Importantes:
 *   **RabbitMQ Management UI**: [http://localhost:15672](http://localhost:15672) (Usuário: `fcg_user` | Senha: `fcg_password`)
@@ -93,5 +92,3 @@ As seguintes variáveis de ambiente configuram a comunicação dos microsserviç
 | **Catalog** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `catalog` | `Host=postgres;Database=catalog;Username=fcg_user;Password=fcg_password` |
 | **Payments** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `payments` | `Host=postgres;Database=payments;Username=fcg_user;Password=fcg_password` |
 | **Notifications** | *Nenhum banco de dados configurado* | Consome eventos RabbitMQ apenas | - |
-
-*(Nota: No ambiente Kubernetes, as connection strings e as credenciais sensíveis devem ser injetadas a partir das referências aos Secrets `postgres-secret` e `rabbitmq-secret` definidos nos manifestos).*
