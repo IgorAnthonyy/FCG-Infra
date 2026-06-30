@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  postgres:
+  fiapcloudgames:
     image: postgres:15-alpine
-    container_name: fcg-postgres
+    container_name: fcg-fiapcloudgames
     environment:
       POSTGRES_USER: fcg_user
       POSTGRES_PASSWORD: fcg_password
@@ -44,12 +44,12 @@ services:
       - "8081:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=users;Username=fcg_user;Password=fcg_password
+      - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=users;Username=fcg_user;Password=fcg_password
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
     depends_on:
-      postgres:
+      fiapcloudgames:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -61,12 +61,12 @@ services:
     container_name: fcg-catalog-worker-service
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=library;Username=fcg_user;Password=fcg_password
+      - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=library;Username=fcg_user;Password=fcg_password
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
     depends_on:
-      postgres:
+      fiapcloudgames:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -80,12 +80,12 @@ services:
       - "8082:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=catalog;Username=fcg_user;Password=fcg_password
+      - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=catalog;Username=fcg_user;Password=fcg_password
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
     depends_on:
-      postgres:
+      fiapcloudgames:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -93,16 +93,19 @@ services:
       - fcg-network
 
   payments:
-    image: [IMAGEM_DOCKER_HUB]
+    image: drugas/fcgpayments:latest
     container_name: fcg-payments
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=payments;Username=fcg_user;Password=fcg_password
+      - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=payments;Username=fcg_user;Password=fcg_password
       - RabbitMQ__Host=rabbitmq
+      - RabbitMQ_VirtualHost=my_host
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
+      - RabbitMQ_KeyQueueOrderPlaced=order_placed
+      - RabbitMQ_KeyPublisher=payment.processed
     depends_on:
-      postgres:
+      fiapcloudgames:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy

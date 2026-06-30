@@ -87,8 +87,8 @@ As seguintes variáveis de ambiente configuram a comunicação dos microsserviç
 
 | Serviço | Nome da Variável | Descrição | Exemplo de Valor |
 | :--- | :--- | :--- | :--- |
-| **Users** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `users` | `Host=postgres;Database=users;Username=fcg_user;Password=fcg_password` |
-| **CatalogWorkerService** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `library` | `Host=postgres;Database=library;Username=fcg_user;Password=fcg_password` |
-| **Catalog** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `catalog` | `Host=postgres;Database=catalog;Username=fcg_user;Password=fcg_password` |
-| **Payments** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `payments` | `Host=postgres;Database=payments;Username=fcg_user;Password=fcg_password` |
+| **Users** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `users` | `Host=fiapcloudgames;Database=users;Username=fcg_user;Password=fcg_password` |
+| **CatalogWorkerService** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `library` | `Host=fiapcloudgames;Database=library;Username=fcg_user;Password=fcg_password` |
+| **Catalog** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `catalog` | `Host=fiapcloudgames;Database=catalog;Username=fcg_user;Password=fcg_password` |
+| **Payments** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `payments` | `Host=fiapcloudgames;Database=payments;Username=fcg_user;Password=fcg_password` |
 | **Notifications** | *Nenhum banco de dados configurado* | Consome eventos RabbitMQ apenas | - |
