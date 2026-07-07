@@ -119,15 +119,18 @@ services:
       - fcg-network
 
   notifications:
-    image: [IMAGEM_DOCKER_HUB]
+    image: otavioandrade/fcg-notifications-api:latest
     container_name: fcg-notifications
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=fcg_notifications;Username=fcg_user;Password=fcg_password
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
       - RabbitMQ__VirtualHost=/
     depends_on:
+      fiapcloudgames:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
     networks:
