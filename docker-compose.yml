@@ -49,6 +49,7 @@ services:
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
       - RabbitMQ__VirtualHost=/
+      - Jwt__Key=minha_chave_secreta_super_segura_de_desenvolvimento_com_mais_de_32_caracteres_12345
     depends_on:
       fiapcloudgames:
         condition: service_healthy
@@ -88,6 +89,7 @@ services:
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
       - RabbitMQ__VirtualHost=/
+      - Jwt__SigningKey=minha_chave_secreta_super_segura_de_desenvolvimento_com_mais_de_32_caracteres_12345
     depends_on:
       fiapcloudgames:
         condition: service_healthy
@@ -97,7 +99,7 @@ services:
       - fcg-network
 
   payments:
-    image: drugas/fcgpayments:latest
+    image: drungas/fcgpayments:latest
     container_name: fcg-payments
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -106,8 +108,8 @@ services:
       - RabbitMQ__VirtualHost=/
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
-      - RabbitMQ_KeyQueueOrderPlaced=order_placed
-      - RabbitMQ_KeyPublisher=payment.processed
+      - RabbitMQ__KeyQueueOrderPlaced=order_placed
+      - RabbitMQ__KeyPublisher=payment.processed
     depends_on:
       fiapcloudgames:
         condition: service_healthy
