@@ -92,3 +92,11 @@ As seguintes variáveis de ambiente configuram a comunicação dos microsserviç
 | **Catalog** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `catalog` | `Host=fiapcloudgames;Database=catalog;Username=fcg_user;Password=fcg_password` |
 | **Payments** | `ConnectionStrings__DefaultConnection` | String de conexão com banco de dados `payments` | `Host=fiapcloudgames;Database=payments;Username=fcg_user;Password=fcg_password` |
 | **Notifications** | *Nenhum banco de dados configurado* | Consome eventos RabbitMQ apenas | - |
+
+### Configurações de Filas e Chaves de Rota (RabbitMQ) por Serviço
+
+| Serviço | Nome da Variável | Descrição | Exemplo de Valor |
+| :--- | :--- | :--- | :--- |
+| **Payments** | `RabbitMQ_KeyQueueOrderPlaced` | Chave/Fila para consumo de pedidos criados | `order_placed` |
+| **Payments** | `RabbitMQ_KeyPublisher` | Chave de roteamento para publicação do resultado do pagamento | `payment.processed` |
+| **CatalogWorkerService** | `RabbitMQ__KeyQueuePaymentProcessed` | Chave/Fila para consumo de pagamentos processados | `payment.processed` |

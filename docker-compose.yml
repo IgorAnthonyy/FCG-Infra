@@ -48,6 +48,7 @@ services:
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
+      - RabbitMQ__VirtualHost=/
     depends_on:
       fiapcloudgames:
         condition: service_healthy
@@ -57,7 +58,7 @@ services:
       - fcg-network
 
   catalog-worker-service:
-    image: [IMAGEM_DOCKER_HUB]
+    image: drungas/fcgcatalogworker:latest
     container_name: fcg-catalog-worker-service
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -65,6 +66,8 @@ services:
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
+      - RabbitMQ__VirtualHost=/
+      - RabbitMQ__KeyQueuePaymentProcessed=payment.processed
     depends_on:
       fiapcloudgames:
         condition: service_healthy
@@ -74,7 +77,7 @@ services:
       - fcg-network
 
   catalog:
-    image: [IMAGEM_DOCKER_HUB]
+    image: devsergioh/fcg-catalog-api:1.0.0
     container_name: fcg-catalog
     ports:
       - "8082:8080"
@@ -84,6 +87,7 @@ services:
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
+      - RabbitMQ__VirtualHost=/
     depends_on:
       fiapcloudgames:
         condition: service_healthy
@@ -99,7 +103,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=payments;Username=fcg_user;Password=fcg_password
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ_VirtualHost=my_host
+      - RabbitMQ__VirtualHost=/
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
       - RabbitMQ_KeyQueueOrderPlaced=order_placed
@@ -120,6 +124,7 @@ services:
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
+      - RabbitMQ__VirtualHost=/
     depends_on:
       rabbitmq:
         condition: service_healthy
