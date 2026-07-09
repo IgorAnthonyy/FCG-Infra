@@ -41,15 +41,15 @@ spec:
           mountPath: /etc/rabbitmq/enabled_plugins
           subPath: enabled_plugins
         livenessProbe:
-          exec:
-            command: ["rabbitmq-diagnostics", "check_running"]
-          initialDelaySeconds: 15
-          periodSeconds: 10
+          tcpSocket:
+            port: 5672
+          initialDelaySeconds: 45
+          periodSeconds: 15
         readinessProbe:
-          exec:
-            command: ["rabbitmq-diagnostics", "check_running"]
-          initialDelaySeconds: 15
-          periodSeconds: 10
+          tcpSocket:
+            port: 5672
+          initialDelaySeconds: 30
+          periodSeconds: 15
       volumes:
       - name: rabbitmq-config-volume
         configMap:

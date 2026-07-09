@@ -63,7 +63,7 @@ services:
     container_name: fcg-catalog-worker-service
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=library;Username=fcg_user;Password=fcg_password
+      - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=catalog;Username=fcg_user;Password=fcg_password
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
@@ -119,15 +119,21 @@ services:
       - fcg-network
 
   notifications:
-    image: otavioandrade/fcg-notifications-api:latest
+    image: igoranthony12/notification-api:latest
     container_name: fcg-notifications
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=fcg_notifications;Username=fcg_user;Password=fcg_password
+      - ConnectionStrings__DefaultConnection=Host=fiapcloudgames;Database=notifications;Username=fcg_user;Password=fcg_password
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
       - RabbitMQ__VirtualHost=/
+      - Smtp__Host=smtp.gmail.com
+      - Smtp__Port=587
+      - Smtp__Username=exemplo@email
+      - Smtp__Password=exemplopassword
+      - Smtp__SenderName=Fiap Cloud Games
+      - Smtp__SenderEmail=exemplo@email
     depends_on:
       fiapcloudgames:
         condition: service_healthy
