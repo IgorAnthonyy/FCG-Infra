@@ -39,7 +39,7 @@ O arquivo `docker-compose.yml` na raiz sobe os cinco microsserviços juntamente 
    ```bash
    docker-compose up -d
    ```
-2. Os bancos de dados (`users`, `library`, `catalog`, `payments`) serão criados e migrados automaticamente pelos próprios microsserviços (.NET migrations) em sua inicialização.
+2. Os bancos de dados (`users`, `notifications`, `catalog`, `payments`) serão criados e migrados automaticamente pelos próprios microsserviços (.NET migrations) em sua inicialização.
 
 ### Endereços Locais Importantes:
 *   **RabbitMQ Management UI**: [http://localhost:15672](http://localhost:15672) (Usuário: `fcg_user` | Senha: `fcg_password`)
