@@ -1,0 +1,41 @@
+global:
+  scrape_interval: 15s # Intervalo padrão de coleta
+  evaluation_interval: 15s # Intervalo de avaliação de regras
+  external_labels:
+    cluster: 'docker-local'
+    environment: 'development'
+
+# Configuração de scrape (coleta de métricas)
+scrape_configs:
+  # Monitoramento do próprio Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          app: 'prometheus'
+          tier: 'monitoring'
+
+  # Monitoramento da aplicação .NET FCG-Cloud-Game - User
+  - job_name: 'users-api'
+    scrape_interval: 10s # Coleta mais frequente para a aplicação
+    metrics_path: '/metrics' # Endpoint exposto pelo prometheus-net
+    static_configs:
+      - targets: ['users-api:8080']
+        labels:
+          app: 'users-api'
+          tier: 'application'
+          language: 'dotnet'
+          framework: 'aspnetcore'
+
+
+# Configuração de alertas (opcional - para demonstração)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
+# Regras de gravação e alertas (opcional)
+# rule_files:
+#   - "alerts/*.yml"
+#   - "rules/*.yml"
