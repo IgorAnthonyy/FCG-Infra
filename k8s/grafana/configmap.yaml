@@ -13,3 +13,17 @@ data:
         url: http://prometheus:9090
         isDefault: true
         editable: true
+
+      - name: Tempo
+        type: tempo
+        access: proxy
+        url: http://tempo.default:3200
+        editable: true
+        isDefault: false
+
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki.default:3100
+        editable: true
+        isDefault: false

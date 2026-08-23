@@ -32,3 +32,20 @@ data:
             target_label: pod
           - source_labels: [__meta_kubernetes_namespace]
             target_label: namespace
+      
+      - job_name: 'catalog-api'
+        scrape_interval: 10s
+        metrics_path: '/metrics'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - default
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: catalog-api
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace

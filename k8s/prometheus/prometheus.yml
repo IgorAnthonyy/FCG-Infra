@@ -27,6 +27,18 @@ scrape_configs:
           language: 'dotnet'
           framework: 'aspnetcore'
 
+  # Monitoramento da aplicação .NET FCG-Cloud-Game - Catalog
+  - job_name: 'catalog-api'
+    scrape_interval: 10s # Coleta mais frequente para a aplicação
+    metrics_path: '/metrics' # Endpoint exposto pelo prometheus-net
+    static_configs:
+      - targets: ['catalog-api:8081']
+        labels:
+          app: 'catalog-api'
+          tier: 'application'
+          language: 'dotnet'
+          framework: 'aspnetcore'
+
 
 # Configuração de alertas (opcional - para demonstração)
 # alerting:

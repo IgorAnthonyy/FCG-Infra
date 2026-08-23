@@ -10,3 +10,4 @@ configMapGenerator:
   - name: grafana-dashboards
     files:
       - UsersAPI-Dash.json
+      - CatalogAPI-Dash.json
