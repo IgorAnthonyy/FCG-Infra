@@ -9,6 +9,7 @@ resources:
   - kong-database/deployment.yaml
   - kong-database/service.yaml
   - kong-database/configmap.yaml
+  - kong-database/pvc.yaml
 
   # Kong
   - kong-service/job.yaml
@@ -19,3 +20,10 @@ resources:
   - konga-service/job.yaml
   - konga-service/deployment.yaml
   - konga-service/service.yaml
+
+configMapGenerator:
+  - name: kong-backup
+    files:
+      - kong-service/kong-backup.yaml
+generatorOptions:
+  disableNameSuffixHash: true

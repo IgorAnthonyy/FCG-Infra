@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: kong
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: kong

@@ -1,0 +1,118 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kong-restore
+  namespace: default
+spec:
+  backoffLimit: 5
+
+  template:
+    metadata:
+      labels:
+        app: kong-restore
+
+    spec:
+      restartPolicy: OnFailure
+
+      containers:
+        - name: kong-restore
+          image: kong:3.4
+
+          env:
+            - name: KONG_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DATABASE
+
+            - name: KONG_PG_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_HOST
+
+            - name: KONG_PG_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_PORT
+
+            - name: KONG_PG_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_NAME
+
+            - name: KONG_PG_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_USERNAME
+
+            - name: KONG_PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kong-secrets
+                  key: KONG_DB_PASSWORD
+
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+
+              echo "======================================"
+              echo "Kong Restore"
+              echo "======================================"
+
+              echo "Aguardando PostgreSQL..."
+
+              until kong migrations list > /dev/null 2>&1; do
+                echo "PostgreSQL/Kong database ainda não está pronto..."
+                sleep 3
+              done
+
+              echo "Banco do Kong disponível."
+
+              echo "Verificando se já existe configuração..."
+
+              SERVICE_COUNT=$(kong config db_export /tmp/current.yaml >/dev/null 2>&1 && \
+                grep -c "^  - name:" /tmp/current.yaml || true)
+
+              if [ "$SERVICE_COUNT" -gt 0 ]; then
+                echo "Configuração existente encontrada."
+                echo "Backup NÃO será restaurado."
+
+                echo "======================================"
+                echo "Restore ignorado."
+                echo "======================================"
+
+                exit 0
+              fi
+
+              echo "Banco sem Services."
+              echo "Restaurando backup..."
+
+              echo "Validando backup..."
+
+              kong config parse /backup/kong-backup.yaml
+
+              echo "Backup válido."
+
+              echo "Importando configuração..."
+
+              kong config db_import /backup/kong-backup.yaml
+
+              echo "======================================"
+              echo "Restore concluído!"
+              echo "======================================"
+
+          volumeMounts:
+            - name: kong-backup
+              mountPath: /backup
+              readOnly: true
+
+      volumes:
+        - name: kong-backup
+          configMap:
+            name: kong-backup

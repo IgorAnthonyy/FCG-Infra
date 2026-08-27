@@ -1,0 +1,345 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: users-service
+    host: users-api-service
+    port: 8080
+    protocol: http
+
+    connect_timeout: 60000
+    read_timeout: 60000
+    write_timeout: 60000
+
+    retries: 5
+    enabled: true
+
+    routes:
+
+      # ============================================================
+      # Metrics
+      # GET /user-service/metrics
+      # ============================================================
+      - name: user-service-metrics
+        tags: []
+
+        paths:
+          - "~/user-service/(metrics)"
+
+        protocols:
+          - http
+          - https
+
+        methods:
+          - GET
+
+        strip_path: false
+        preserve_host: false
+
+        path_handling: v1
+
+        request_buffering: true
+        response_buffering: true
+
+        https_redirect_status_code: 426
+
+        plugins:
+          - name: request-transformer
+            enabled: true
+
+            protocols:
+              - grpc
+              - grpcs
+              - http
+              - https
+
+            config:
+              http_method: null
+
+              add:
+                body: []
+                querystring: []
+                headers: []
+
+              append:
+                body: []
+                querystring: []
+                headers: []
+
+              rename:
+                body: []
+                querystring: []
+                headers: []
+
+              remove:
+                body: []
+                querystring: []
+                headers: []
+
+              replace:
+                body: []
+                querystring: []
+                headers: []
+                uri: "/$(uri_captures[1])"
+
+
+      # ============================================================
+      # Create User - PUBLIC
+      # POST /user-service/api/User
+      # ============================================================
+      - name: user-service-create-public-user
+        tags:
+          - user
+
+        paths:
+          - "~/user-service/(api/User)$"
+
+        protocols:
+          - http
+          - https
+
+        methods:
+          - POST
+
+        strip_path: false
+        preserve_host: false
+
+        path_handling: v1
+
+        request_buffering: true
+        response_buffering: true
+
+        https_redirect_status_code: 426
+
+        plugins:
+          - name: request-transformer
+            enabled: true
+
+            protocols:
+              - grpc
+              - grpcs
+              - http
+              - https
+
+            config:
+              http_method: null
+
+              add:
+                body: []
+                querystring: []
+                headers: []
+
+              append:
+                body: []
+                querystring: []
+                headers: []
+
+              rename:
+                body: []
+                querystring: []
+                headers: []
+
+              remove:
+                body: []
+                querystring: []
+                headers: []
+
+              replace:
+                body: []
+                querystring: []
+                headers: []
+                uri: "/$(uri_captures[1])"
+
+
+      # ============================================================
+      # Users
+      # POST/DELETE/PUT/GET /user-service/api/User/*
+      # ============================================================
+      - name: user-service-users
+        tags:
+          - users
+
+        paths:
+          - "~/user-service/(api/User/.+)"
+
+        protocols:
+          - http
+          - https
+
+        methods:
+          - POST
+          - DELETE
+          - PUT
+          - GET
+
+        strip_path: false
+        preserve_host: false
+
+        path_handling: v1
+
+        request_buffering: true
+        response_buffering: true
+
+        https_redirect_status_code: 426
+
+        plugins:
+
+          # -------------------------
+          # JWT
+          # -------------------------
+          - name: jwt
+            enabled: true
+
+            protocols:
+              - grpc
+              - grpcs
+              - http
+              - https
+
+            config:
+              cookie_names: []
+
+              header_names:
+                - Authorization
+
+              secret_is_base64: false
+
+              maximum_expiration: 0
+
+              claims_to_verify:
+                - exp
+
+              anonymous: null
+
+              key_claim_name: iss
+
+              run_on_preflight: true
+
+              uri_param_names:
+                - jwt
+
+
+          # -------------------------
+          # Request Transformer
+          # -------------------------
+          - name: request-transformer
+            enabled: true
+
+            protocols:
+              - grpc
+              - grpcs
+              - http
+              - https
+
+            config:
+              http_method: null
+
+              add:
+                body: []
+                querystring: []
+                headers: []
+
+              append:
+                body: []
+                querystring: []
+                headers: []
+
+              rename:
+                body: []
+                querystring: []
+                headers: []
+
+              remove:
+                body: []
+                querystring: []
+                headers: []
+
+              replace:
+                body: []
+                querystring: []
+                headers: []
+                uri: "/$(uri_captures[1])"
+
+
+      # ============================================================
+      # Login - PUBLIC
+      # POST /user-service/api/Access/*
+      # ============================================================
+      - name: user-service-login
+        tags:
+          - login
+
+        paths:
+          - "~/user-service/(api/Access.*)"
+
+        protocols:
+          - http
+          - https
+
+        methods:
+          - POST
+
+        strip_path: false
+        preserve_host: false
+
+        path_handling: v1
+
+        request_buffering: true
+        response_buffering: true
+
+        https_redirect_status_code: 426
+
+        plugins:
+          - name: request-transformer
+            enabled: true
+
+            protocols:
+              - grpc
+              - grpcs
+              - http
+              - https
+
+            config:
+              http_method: null
+
+              add:
+                body: []
+                querystring: []
+                headers: []
+
+              append:
+                body: []
+                querystring: []
+                headers: []
+
+              rename:
+                body: []
+                querystring: []
+                headers: []
+
+              remove:
+                body: []
+                querystring: []
+                headers: []
+
+              replace:
+                body: []
+                querystring: []
+                headers: []
+                uri: "/$(uri_captures[1])"
+
+
+# ================================================================
+# Consumer
+# ================================================================
+consumers:
+
+  - username: fcgames-api
+    custom_id: fcgames-api
+    tags: []
+
+    jwt_secrets:
+
+      - key: FCGames
+        algorithm: HS256
+        secret: "ChaveSuperSecretaECompridaDeExemplo123!"

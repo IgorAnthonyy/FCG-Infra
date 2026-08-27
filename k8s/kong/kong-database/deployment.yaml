@@ -37,6 +37,9 @@ spec:
                   key: KONG_DB_PASSWORD
 
           volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d/init.sql
               subPath: init.sql
@@ -52,6 +55,10 @@ spec:
           
 
       volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: kong-postgres-pvc
+            
         - name: init-script
           configMap:
             name: kong-db-init
