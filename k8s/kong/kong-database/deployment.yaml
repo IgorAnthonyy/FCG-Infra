@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong-database
+  template:
+    metadata:
+      labels:
+        app: kong-database
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:11.16
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_NAME
+
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_USERNAME
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kong-secrets
+                  key: KONG_DB_PASSWORD
+
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 20
+          
+
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: kong-postgres-pvc
+            
+        - name: init-script
+          configMap:
+            name: kong-db-init

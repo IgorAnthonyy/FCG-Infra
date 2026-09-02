@@ -50,8 +50,27 @@ services:
     networks:
       - fcg-network
 
+  mongo:
+    image: mongo:7
+    container_name: fcg-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: fcg_user
+      MONGO_INITDB_ROOT_PASSWORD: fcg_password
+      MONGO_INITDB_DATABASE: fcg_catalog
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "-u", "fcg_user", "-p", "fcg_password", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fcg-network
+
   users:
-    image: igoranthony12/users-api:latest
+    image: drungas/fcgusers-monitoring:latest
     container_name: fcg-users
     ports:
       - "8081:8080"
@@ -63,6 +82,7 @@ services:
       - RabbitMQ__Password=fcg_password
       - RabbitMQ__VirtualHost=/
       - Jwt__Key=minha_chave_secreta_super_segura_de_desenvolvimento_com_mais_de_32_caracteres_12345
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
     depends_on:
       fiapcloudgames:
         condition: service_healthy
@@ -91,7 +111,7 @@ services:
       - fcg-network
 
   catalog:
-    image: devsergioh/fcg-catalog-api:1.0.0
+    image: devsergioh/fcg-catalog-api:1.1.0
     container_name: fcg-catalog
     ports:
       - "8082:8080"
@@ -105,13 +125,19 @@ services:
       - "Redis__ConnectionString=redis:6379"
       - "Redis__InstanceName=fcg:catalog:"
       - Redis__DefaultTtlMinutes=15
+      - MongoDB__ConnectionString=mongodb://fcg_user:fcg_password@mongo:27017/fcg_catalog?authSource=admin
+      - MongoDB__DatabaseName=fcg_catalog
+      - MongoDB__ReviewsCollectionName=reviews
       - Jwt__SigningKey=minha_chave_secreta_super_segura_de_desenvolvimento_com_mais_de_32_caracteres_12345
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
     depends_on:
       fiapcloudgames:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      mongo:
         condition: service_healthy
     networks:
       - fcg-network
@@ -160,8 +186,236 @@ services:
     networks:
       - fcg-network
 
+  # ============================================================
+  # Observabilidade (traduzido de k8s/)
+  # ============================================================
+
+  tempo:
+    image: grafana/tempo:main-ad33aa8-2070-1
+    container_name: fcg-tempo
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./config/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - tempo_data:/var/tempo/traces
+    networks:
+      - fcg-network
+
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: fcg-loki
+    command: ["-config.file=/etc/loki/loki.yaml"]
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./config/loki/loki.yaml:/etc/loki/loki.yaml:ro
+      - loki_data:/loki
+    networks:
+      - fcg-network
+
+  promtail:
+    image: grafana/promtail:2.9.3
+    container_name: fcg-promtail
+    command: ["-config.file=/etc/promtail/promtail.yaml"]
+    ports:
+      - "9080:9080"
+    volumes:
+      - ./config/promtail/promtail.yaml:/etc/promtail/promtail.yaml:ro
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      loki:
+        condition: service_started
+    networks:
+      - fcg-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: fcg-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - fcg-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: fcg-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_started
+      tempo:
+        condition: service_started
+      loki:
+        condition: service_started
+    networks:
+      - fcg-network
+
+  # ============================================================
+  # Kong / Konga (traduzido de k8s/)
+  # ============================================================
+
+  kong-database:
+    image: postgres:11.16
+    container_name: fcg-kong-database
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: kong
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kong
+    volumes:
+      - kong_postgres_data:/var/lib/postgresql/data
+      - ./config/kong/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kong -d kong"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - fcg-network
+
+  kong-migrations:
+    image: kong:3.4
+    container_name: fcg-kong-migrations
+    command: ["/bin/sh", "-c", "kong migrations bootstrap"]
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PORT: "5432"
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - fcg-network
+
+  kong-restore:
+    image: kong:3.4
+    container_name: fcg-kong-restore
+    command: ["/bin/sh", "-c", "set -e; echo 'Aguardando PostgreSQL...'; until kong migrations list > /dev/null 2>&1; do echo 'Kong database ainda não está pronto...'; sleep 3; done; echo 'Banco do Kong disponível.'; echo 'Verificando se já existe configuração...'; SERVICE_COUNT=$$(kong config db_export /tmp/current.yaml >/dev/null 2>&1 && grep -c '^  - name:' /tmp/current.yaml || true); if [ \"$$SERVICE_COUNT\" -gt 0 ]; then echo 'Configuração existente encontrada. Backup NÃO será restaurado.'; exit 0; fi; echo 'Banco sem Services. Restaurando backup...'; echo 'Validando backup...'; kong config parse /backup/kong-backup.yaml; echo 'Backup válido.'; echo 'Importando configuração...'; kong config db_import /backup/kong-backup.yaml; echo 'Restore concluído!'"]
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PORT: "5432"
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+    volumes:
+      - ./config/kong/kong-backup.yaml:/backup/kong-backup.yaml:ro
+    depends_on:
+      kong-database:
+        condition: service_healthy
+      kong-migrations:
+        condition: service_completed_successfully
+    restart: "no"
+    networks:
+      - fcg-network
+
+  kong:
+    image: kong:3.4
+    container_name: fcg-kong
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
+      - "8002:8002"
+      - "8445:8445"
+      - "8003:8003"
+      - "8004:8004"
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PORT: "5432"
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+      KONG_LOG_LEVEL: error
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+      KONG_ADMIN_GUI_LISTEN: 0.0.0.0:8002
+      KONG_ADMIN_GUI_PATH: /
+      KONG_ADMIN_GUI_URL: http://0.0.0.0:8002
+      KONG_RBAC: "on"
+      KONG_FORCE_RBAC: "on"
+      KONG_ADMIN_GUI_AUTH: basic-auth
+    depends_on:
+      kong-database:
+        condition: service_healthy
+      kong-migrations:
+        condition: service_completed_successfully
+      kong-restore:
+        condition: service_completed_successfully
+    networks:
+      - fcg-network
+
+  konga-prepare:
+    image: pantsel/konga:latest
+    container_name: fcg-konga-prepare
+    command: ["-c", "prepare", "-a", "postgres", "-u", "postgresql://kong:kong@kong-database:5432/konga"]
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - fcg-network
+
+  konga:
+    image: pantsel/konga:latest
+    container_name: fcg-konga
+    ports:
+      - "1337:1337"
+    environment:
+      TOKEN_SECRET: konga
+      DB_ADAPTER: postgres
+      DB_HOST: kong-database
+      DB_PORT: "5432"
+      DB_DATABASE: konga
+      DB_USER: kong
+      DB_PASSWORD: kong
+      NODE_ENV: production
+    depends_on:
+      kong-database:
+        condition: service_healthy
+      konga-prepare:
+        condition: service_completed_successfully
+    networks:
+      - fcg-network
+
 volumes:
   postgres_data:
+  mongo_data:
+  tempo_data:
+  loki_data:
+  prometheus_data:
+  kong_postgres_data:
 
 networks:
   fcg-network:
