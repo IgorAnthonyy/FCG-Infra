@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - configmap.yaml
+  - secret.yaml
+
+  # PostgreSQL
+  - kong-database/deployment.yaml
+  - kong-database/service.yaml
+  - kong-database/configmap.yaml
+  - kong-database/pvc.yaml
+
+  # Kong
+  - kong-service/job.yaml
+  - kong-service/deployment.yaml
+  - kong-service/service.yaml
+
+  # Konga
+  - konga-service/job.yaml
+  - konga-service/deployment.yaml
+  - konga-service/service.yaml
+
+configMapGenerator:
+  - name: kong-backup
+    files:
+      - kong-service/kong-backup.yaml
+generatorOptions:
+  disableNameSuffixHash: true

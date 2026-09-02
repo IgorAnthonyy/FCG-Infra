@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: konga-prepare
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:11.16
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h kong-database -p 5433 -U kong; do
+                echo "Waiting for PostgreSQL..."
+                sleep 2
+              done
+      containers:
+        - name: konga-prepare
+          image: pantsel/konga:latest
+          command:
+            - /bin/sh
+            - -c
+            - >
+              /app/start.sh
+              -c prepare
+              -a postgres
+              -u postgresql://kong:kong@kong-database:5433/konga

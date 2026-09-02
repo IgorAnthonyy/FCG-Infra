@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: kong
+  template:
+    metadata:
+      labels:
+        app: kong
+    spec:
+      containers:
+        - name: kong
+          image: kong:3.4
+          ports:
+            - name: proxy
+              containerPort: 8000
+
+            - name: proxy-ssl
+              containerPort: 8443
+
+            - name: admin
+              containerPort: 8001
+
+            - name: admin-ssl
+              containerPort: 8444
+
+            - name: manager
+              containerPort: 8002
+
+            - name: manager-ssl
+              containerPort: 8445
+
+            - name: kong-3
+              containerPort: 8003
+
+            - name: kong-4
+              containerPort: 8004
+          env:
+            - name: KONG_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DATABASE
+
+            - name: KONG_PG_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_HOST
+
+            - name: KONG_PG_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_PORT
+                  
+            - name: KONG_PG_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_NAME
+            
+            - name: KONG_PG_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_USERNAME
+
+            - name: KONG_PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kong-secrets
+                  key: KONG_DB_PASSWORD
+
+            - name: KONG_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_LOG_LEVEL
+            
+            - name: KONG_PROXY_ACCESS_LOG
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_PROXY_ACCESS_LOG
+
+            - name: KONG_ADMIN_ACCESS_LOG
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_ADMIN_ACCESS_LOG
+
+            - name: KONG_PROXY_ERROR_LOG
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_PROXY_ERROR_LOG
+
+            - name: KONG_ADMIN_ERROR_LOG
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_ADMIN_ERROR_LOG
+            
+            - name: KONG_ADMIN_LISTEN
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_ADMIN_LISTEN
+
+            - name: KONG_ADMIN_GUI_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_ADMIN_GUI_URL
+      volumes:
+      - name: kong-data
+        emptyDir: {}

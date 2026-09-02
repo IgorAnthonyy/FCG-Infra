@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kong-migrations
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:11.16
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h kong-database -p 5433 -U kong; do
+                echo "Waiting for PostgreSQL..."
+                sleep 2
+              done
+      containers:
+        - name: kong-migrations
+          image: kong:3.4
+          command:
+            - /bin/sh
+            - -c
+            - kong migrations bootstrap
+          env:
+            - name: KONG_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DATABASE
+
+            - name: KONG_PG_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_HOST
+
+            - name: KONG_PG_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_PORT
+
+                  
+            - name: KONG_PG_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_NAME
+            - name: KONG_PG_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: kong-config
+                  key: KONG_DB_USERNAME
+            - name: KONG_PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kong-secrets
+                  key: KONG_DB_PASSWORD
