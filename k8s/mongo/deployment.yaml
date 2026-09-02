@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  labels:
+    app: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:7
+        ports:
+        - containerPort: 27017
+          name: mongo
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password
+        - name: MONGO_INITDB_DATABASE
+          value: fcg_catalog
+        volumeMounts:
+        - name: mongo-data
+          mountPath: /data/db
+        livenessProbe:
+          exec:
+            command: ["mongosh", "-u", "fcg_user", "-p", "fcg_password", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command: ["mongosh", "-u", "fcg_user", "-p", "fcg_password", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+          initialDelaySeconds: 15
+          periodSeconds: 10
+      volumes:
+      - name: mongo-data
+        emptyDir: {}
