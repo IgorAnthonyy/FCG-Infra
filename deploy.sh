@@ -30,6 +30,30 @@ kubectl rollout status \
   --timeout=120s
 
 echo "Postgres ficou disponivel"
+echo "======================================"
+echo "Aplicando redis da aplicação"
+
+kubectl apply -f ./k8s/redis
+
+echo "Aguardando redis ficar disponivel"
+
+kubectl rollout status \
+  deployment/redis \
+  --timeout=120s
+
+echo "Redis ficou disponivel"
+echo "======================================"
+echo "Aplicando mongo da aplicação"
+
+kubectl apply -f ./k8s/mongo
+
+echo "Aguardando mongo ficar disponivel"
+
+kubectl rollout status \
+  deployment/mongo \
+  --timeout=120s
+
+echo "Mongo ficou disponivel"
 
 
 echo "======================================"

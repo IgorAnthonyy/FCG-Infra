@@ -22,6 +22,22 @@ echo "Postgres desceu"
 
 echo "======================================"
 
+echo "Descendo redis..."
+
+kubectl delete -f ./k8s/redis/
+
+echo "Redis desceu"
+
+echo "======================================"
+
+echo "Descendo mongo..."
+
+kubectl delete -f ./k8s/mongo/
+
+echo "Mongo desceu"
+
+echo "======================================"
+
 echo "Descendo tempo..."
 
 kubectl delete -f ./k8s/tempo/
