@@ -4,20 +4,20 @@
   "metadata": {
     "name": "ad6gnq2",
     "namespace": "default",
-    "uid": "345f08af-82f6-40ec-897c-129d8ae7370e",
-    "resourceVersion": "1787461918428987",
+    "uid": "fd712a6c-0c37-4a88-a672-6f22dbf744bc",
+    "resourceVersion": "1788460926494000",
     "generation": 1,
-    "creationTimestamp": "2026-08-23T05:11:58Z",
+    "creationTimestamp": "2026-09-03T18:42:06Z",
     "labels": {
-      "grafana.app/deprecatedInternalID": "1722757668155392"
+      "grafana.app/deprecatedInternalID": "1409301560475648"
     },
     "annotations": {
       "grafana.app/createdBy": "access-policy:service",
       "grafana.app/managedBy": "classic-file-provisioning",
       "grafana.app/managerId": "default",
-      "grafana.app/sourceChecksum": "43ed02f0ea998260067fb6c749eb9253",
+      "grafana.app/sourceChecksum": "e196d16dd4072d37a20d9ab9f0b5894c",
       "grafana.app/sourcePath": "/var/lib/grafana/dashboards/UsersAPI-Dash.json",
-      "grafana.app/sourceTimestamp": "1787461903000",
+      "grafana.app/sourceTimestamp": "1788460904000",
       "grafana.app/folder": ""
     }
   },
@@ -65,7 +65,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(rate(http_requests_received_total{job=\"$job\"}[5m])) * 60",
+                        "expr": "sum(rate(http_requests_received_total{job=\"users-api\"}[5m])) * 60",
                         "instant": false,
                         "legendFormat": "__auto",
                         "range": true
@@ -157,7 +157,7 @@
                 }
               }
             },
-            "version": "13.2.0"
+            "version": "13.2.1"
           }
         }
       },
@@ -180,7 +180,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "histogram_quantile(\r\n  0.95,\r\n  rate(http_request_duration_seconds_bucket{job=\"$job\"}[5m])\r\n) * 1000",
+                        "expr": "histogram_quantile(\r\n  0.95,\r\n  rate(http_request_duration_seconds_bucket{job=\"users-api\"}[5m])\r\n) * 1000",
                         "legendFormat": "__auto",
                         "range": true
                       },
@@ -272,7 +272,7 @@
                 }
               }
             },
-            "version": "13.2.0"
+            "version": "13.2.1"
           }
         }
       },
@@ -295,7 +295,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "(\r\n  sum(rate(http_requests_received_total{job=\"$job\", code=~\"[45]..\"}[5m]))\r\n  /\r\n  sum(rate(http_requests_received_total{job=\"$job\"}[5m]))\r\n) * 100",
+                        "expr": "(\r\n  sum(rate(http_requests_received_total{job=\"users-api\", code=~\"[45]..\"}[5m]))\r\n  /\r\n  sum(rate(http_requests_received_total{job=\"users-api\"}[5m]))\r\n) * 100",
                         "legendFormat": "__auto",
                         "range": true
                       },
@@ -357,7 +357,7 @@
                 "wideLayout": true
               }
             },
-            "version": "13.2.0"
+            "version": "13.2.1"
           }
         }
       },
@@ -380,7 +380,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(http_requests_received_total{job=\"$job\"})",
+                        "expr": "sum(http_requests_received_total{job=\"users-api\"})",
                         "legendFormat": "__auto",
                         "range": true
                       },
@@ -441,7 +441,7 @@
                 "wideLayout": true
               }
             },
-            "version": "13.2.0"
+            "version": "13.2.1"
           }
         }
       },
@@ -465,7 +465,7 @@
                       "spec": {
                         "editorMode": "code",
                         "exemplar": false,
-                        "expr": "sum by (status_family) (\r\n  label_replace(\r\n    increase(http_request_duration_seconds_count{job=\"$job\"}[$__range]),\r\n    \"status_family\",\r\n    \"${1}xx\",\r\n    \"code\",\r\n    \"([2-5]).*\"\r\n  )\r\n)\r\nor\r\nlabel_replace(\r\n  vector(0),\r\n  \"status_family\",\r\n  \"2xx\",\r\n  \"\",\r\n  \"\"\r\n)\r\nor\r\nlabel_replace(\r\n  vector(0),\r\n  \"status_family\",\r\n  \"3xx\",\r\n  \"\",\r\n  \"\"\r\n)\r\nor\r\nlabel_replace(\r\n  vector(0),\r\n  \"status_family\",\r\n  \"4xx\",\r\n  \"\",\r\n  \"\"\r\n)\r\nor\r\nlabel_replace(\r\n  vector(0),\r\n  \"status_family\",\r\n  \"5xx\",\r\n  \"\",\r\n  \"\"\r\n)",
+                        "expr": "sum by (status_family) (\r\n  label_replace(\r\n    increase(http_request_duration_seconds_count{job=\"users-api\"}[30m]),\r\n    \"status_family\",\r\n    \"${1}xx\",\r\n    \"code\",\r\n    \"(^\\\\d).+\"\r\n  )\r\n) \r\n",
                         "format": "time_series",
                         "instant": true,
                         "interval": "",
@@ -493,7 +493,7 @@
               "fieldConfig": {
                 "defaults": {
                   "color": {
-                    "mode": "thresholds"
+                    "mode": "palette-classic"
                   },
                   "custom": {
                     "axisBorderShow": false,
@@ -501,14 +501,14 @@
                     "axisColorMode": "text",
                     "axisLabel": "",
                     "axisPlacement": "auto",
-                    "fillOpacity": 80,
+                    "fillOpacity": 100,
                     "gradientMode": "none",
                     "hideFrom": {
                       "legend": false,
                       "tooltip": false,
                       "viz": false
                     },
-                    "lineWidth": 1,
+                    "lineWidth": 0,
                     "scaleDistribution": {
                       "type": "linear"
                     },
@@ -516,6 +516,8 @@
                       "mode": "off"
                     }
                   },
+                  "decimals": 0,
+                  "displayName": "${__field.labels.status_family}",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -533,10 +535,10 @@
                 "overrides": []
               },
               "options": {
-                "barRadius": 0,
-                "barWidth": 0.97,
+                "barRadius": 0.05,
+                "barWidth": 0.95,
                 "fullHighlight": false,
-                "groupWidth": 0.7,
+                "groupWidth": 0.8,
                 "legend": {
                   "calcs": [],
                   "displayMode": "list",
@@ -551,12 +553,12 @@
                   "mode": "single",
                   "sort": "none"
                 },
-                "xField": "4xx",
+                "xField": "time",
                 "xTickLabelRotation": 0,
-                "xTickLabelSpacing": 0
+                "xTickLabelSpacing": 100
               }
             },
-            "version": "13.2.0"
+            "version": "13.2.1"
           }
         }
       },
@@ -612,7 +614,7 @@
           "description": "",
           "id": 6,
           "links": [],
-          "title": "New panel",
+          "title": "Traces",
           "vizConfig": {
             "group": "table",
             "kind": "VizConfig",
@@ -653,7 +655,7 @@
                 "showHeader": true
               }
             },
-            "version": "13.2.0"
+            "version": "13.2.1"
           }
         }
       },
@@ -677,7 +679,7 @@
                       "spec": {
                         "direction": "backward",
                         "editorMode": "builder",
-                        "expr": "{pod=\"users-api-9cc5bc9d9-ltrfj\"} |= ``",
+                        "expr": "{app=\"users-api\"} |= ``",
                         "queryType": "range"
                       },
                       "version": "v0"
@@ -717,7 +719,7 @@
                 "wrapLogMessage": false
               }
             },
-            "version": "13.2.0"
+            "version": "13.2.1"
           }
         }
       }
@@ -853,36 +855,6 @@
       "to": "now"
     },
     "title": "Users API -Dash",
-    "variables": [
-      {
-        "kind": "QueryVariable",
-        "spec": {
-          "allowCustomValue": true,
-          "current": {
-            "text": "users-api",
-            "value": "users-api"
-          },
-          "hide": "dontHide",
-          "includeAll": false,
-          "multi": false,
-          "name": "job",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "PBFA97CFB590B2093"
-            },
-            "group": "prometheus",
-            "kind": "DataQuery",
-            "spec": {},
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "regex": "",
-          "regexApplyTo": "value",
-          "skipUrlSync": false,
-          "sort": "disabled"
-        }
-      }
-    ]
+    "variables": []
   }
 }
