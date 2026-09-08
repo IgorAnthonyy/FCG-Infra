@@ -1,1115 +1,940 @@
-_format_version: '3.0'
+_format_version: "3.0"
 _transform: false
 consumers:
-- tags: []
-  created_at: 1787873923
-  updated_at: 1788043809
+- custom_id: fcgames-api
+  jwt_secrets:
+  - algorithm: HS256
+    key: FCGames
+    secret: ChaveSuperSecretaECompridaDeExemplo123!
   username: fcgames-api
-  id: 9db1398e-2c2e-5727-aaed-667525892374
-  custom_id: fcgames-api
-parameters:
-- key: cluster_id
-  value: ac846daa-7ee9-4504-917a-591abc1ae56a
-  created_at: 1788043809
 services:
-- read_timeout: 60000
-  tls_verify: ~
-  created_at: 1787874241
-  protocol: http
-  tls_verify_depth: ~
-  retries: 5
+- connect_timeout: 60000
+  enabled: true
+  host: host.docker.internal
   name: catalog-service
   port: 8082
-  ca_certificates: ~
-  client_certificate: ~
-  tags: []
-  updated_at: 1788043809
-  host: host.docker.internal
-  path: ~
-  id: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  write_timeout: 60000
-  connect_timeout: 60000
-  enabled: true
-- read_timeout: 60000
-  tls_verify: ~
-  created_at: 1787873923
   protocol: http
-  tls_verify_depth: ~
+  read_timeout: 60000
   retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    - PUT
+    - DELETE
+    name: catalog-service-category-no-public
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(api/Category(?:/[0-9]+)?)$
+    plugins:
+    - config:
+        anonymous: null
+        claims_to_verify:
+        - exp
+        cookie_names: []
+        header_names:
+        - authorization
+        key_claim_name: iss
+        maximum_expiration: 0
+        run_on_preflight: true
+        secret_is_base64: false
+        uri_param_names:
+        - jwt
+      enabled: true
+      name: jwt
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - catalog
+    - category
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: catalog-service-category-public
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(api/Category(?:/[0-9]+)?)$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - category
+    - catalog
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    - PUT
+    - DELETE
+    name: catalog-service-game-no-public
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(api/Game(?:/[0-9]+)?)$
+    plugins:
+    - config:
+        anonymous: null
+        claims_to_verify:
+        - exp
+        cookie_names: []
+        header_names:
+        - authorization
+        key_claim_name: iss
+        maximum_expiration: 0
+        run_on_preflight: true
+        secret_is_base64: false
+        uri_param_names:
+        - jwt
+      enabled: true
+      name: jwt
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - game
+    - catalog
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    name: catalog-service-game-order-no-public
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(api/GameOrders(?:/[0-9]+)?)$
+    plugins:
+    - config:
+        anonymous: null
+        claims_to_verify:
+        - exp
+        cookie_names: []
+        header_names:
+        - authorization
+        key_claim_name: iss
+        maximum_expiration: 0
+        run_on_preflight: true
+        secret_is_base64: false
+        uri_param_names:
+        - jwt
+      enabled: true
+      name: jwt
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - catalog
+    - game-order
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: catalog-service-game-order-public
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(api/GameOrders(?:/[0-9]+)?)$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - catalog
+    - game-order
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: catalog-service-game-public
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(api/Game(?:/[0-9]+)?)$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - game
+    - catalog
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: catalog-service-health
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(Health)
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - health
+    - catalog
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: catalog-service-library-no-public
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(api/Library)
+    plugins:
+    - config:
+        anonymous: null
+        claims_to_verify:
+        - exp
+        cookie_names: []
+        header_names:
+        - authorization
+        key_claim_name: iss
+        maximum_expiration: 0
+        run_on_preflight: true
+        secret_is_base64: false
+        uri_param_names:
+        - jwt
+      enabled: true
+      name: jwt
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - library
+    - catalog
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: catalog-service-metrics
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(metrics)
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - metrics
+    - catalog
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    - PUT
+    - DELETE
+    name: catalog-service-reviews-no-public
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(api/Reviews(?:/[^/]+)*)/?$
+    plugins:
+    - config:
+        anonymous: null
+        claims_to_verify:
+        - exp
+        cookie_names: []
+        header_names:
+        - authorization
+        key_claim_name: iss
+        maximum_expiration: 0
+        run_on_preflight: true
+        secret_is_base64: false
+        uri_param_names:
+        - jwt
+      enabled: true
+      name: jwt
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - catalog
+    - review
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: catalog-service-reviews-public
+    path_handling: v1
+    paths:
+    - ~/catalog-service/(api/Reviews(?:/[^/]+)*)/?$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - catalog
+    - review
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: host.docker.internal
   name: users-service
   port: 8081
-  ca_certificates: ~
-  client_certificate: ~
-  tags: ~
-  updated_at: 1788043809
-  host: host.docker.internal
-  path: ~
-  id: e7550091-15ce-5388-bc5d-2dc61442c715
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    name: user-service-create-public-user
+    path_handling: v1
+    paths:
+    - ~/user-service/(api/User)$
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - users
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: user-service-health
+    path_handling: v1
+    paths:
+    - ~/user-service/(Health)
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - health
+    - user
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    name: user-service-login
+    path_handling: v1
+    paths:
+    - ~/user-service/(api/Access.*)
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - login
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: user-service-metrics
+    path_handling: v1
+    paths:
+    - ~/user-service/(metrics)
+    plugins:
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - user
+    - metrics
+  - https_redirect_status_code: 426
+    methods:
+    - POST
+    - DELETE
+    - PUT
+    - GET
+    name: user-service-users
+    path_handling: v1
+    paths:
+    - ~/user-service/(api/User/.+)
+    plugins:
+    - config:
+        anonymous: null
+        claims_to_verify:
+        - exp
+        cookie_names: []
+        header_names:
+        - Authorization
+        key_claim_name: iss
+        maximum_expiration: 0
+        run_on_preflight: true
+        secret_is_base64: false
+        uri_param_names:
+        - jwt
+      enabled: true
+      name: jwt
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - config:
+        add:
+          body: []
+          headers: []
+          querystring: []
+        append:
+          body: []
+          headers: []
+          querystring: []
+        http_method: null
+        remove:
+          body: []
+          headers: []
+          querystring: []
+        rename:
+          body: []
+          headers: []
+          querystring: []
+        replace:
+          body: []
+          headers: []
+          querystring: []
+          uri: /$(uri_captures[1])
+      enabled: true
+      name: request-transformer
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - users
   write_timeout: 60000
-  connect_timeout: 60000
-  enabled: true
-routes:
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1788046773
-  updated_at: 1788047249
-  methods:
-  - POST
-  - PUT
-  - DELETE
-  https_redirect_status_code: 426
-  strip_path: false
-  name: catalog-service-category-no-public
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - catalog
-  - category
-  snis: ~
-  service: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/catalog-service/(api/Category(?:/[0-9]+)?)$
-  id: 056dd98a-cf6b-46e8-b11a-f448a508c5e0
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1788047433
-  updated_at: 1788047487
-  methods:
-  - POST
-  https_redirect_status_code: 426
-  strip_path: false
-  name: catalog-service-game-order-no-public
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - catalog
-  - game-order
-  snis: ~
-  service: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/catalog-service/(api/GameOrders(?:/[0-9]+)?)$
-  id: 168b432c-befc-457e-8825-dd0a001b01b0
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1787874617
-  updated_at: 1788049528
-  methods:
-  - GET
-  https_redirect_status_code: 426
-  strip_path: false
-  name: catalog-service-health
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - health
-  - catalog
-  snis: ~
-  service: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/catalog-service/(Health)
-  id: 1a61dc66-33df-4a86-a6a5-7ee5fee286d9
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1788047226
-  updated_at: 1788047325
-  methods:
-  - GET
-  https_redirect_status_code: 426
-  strip_path: false
-  name: catalog-service-game-order-public
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - catalog
-  - game-order
-  snis: ~
-  service: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/catalog-service/(api/GameOrders(?:/[0-9]+)?)$
-  id: 254cb0ae-f115-4c1f-b20e-e8f3d2232127
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1788049297
-  updated_at: 1788049362
-  methods:
-  - GET
-  https_redirect_status_code: 426
-  strip_path: false
-  name: catalog-service-library-no-public
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - library
-  - catalog
-  snis: ~
-  service: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/catalog-service/(api/Library)
-  id: 4d53bb97-3d57-4b19-ac57-4ea83f41a3ee
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1787873923
-  updated_at: 1788044111
-  methods:
-  - POST
-  https_redirect_status_code: 426
-  strip_path: false
-  name: user-service-create-public-user
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - users
-  snis: ~
-  service: e7550091-15ce-5388-bc5d-2dc61442c715
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/user-service/(api/User)$
-  id: 52d29211-e096-5c64-a6b2-d8aabfa26deb
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1788050903
-  updated_at: 1788050903
-  methods:
-  - GET
-  https_redirect_status_code: 426
-  strip_path: false
-  name: user-service-health
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - health
-  - user
-  snis: ~
-  service: e7550091-15ce-5388-bc5d-2dc61442c715
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/user-service/(Health)
-  id: 6888e7e7-8ee0-40fc-b078-7cc69a69df78
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1787874372
-  updated_at: 1788049551
-  methods:
-  - GET
-  https_redirect_status_code: 426
-  strip_path: false
-  name: catalog-service-metrics
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - metrics
-  - catalog
-  snis: ~
-  service: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/catalog-service/(metrics)
-  id: 6aebcafd-c01b-43b4-8705-c90b48f7e9ef
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1787873923
-  updated_at: 1788049569
-  methods:
-  - GET
-  https_redirect_status_code: 426
-  strip_path: false
-  name: user-service-metrics
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - user
-  - metrics
-  snis: ~
-  service: e7550091-15ce-5388-bc5d-2dc61442c715
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/user-service/(metrics)
-  id: 7d5622fc-aa81-5b78-a0a4-c9a0c680cad6
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1787873923
-  updated_at: 1788043809
-  methods:
-  - POST
-  https_redirect_status_code: 426
-  strip_path: false
-  name: user-service-login
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - login
-  snis: ~
-  service: e7550091-15ce-5388-bc5d-2dc61442c715
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/user-service/(api/Access.*)
-  id: a1a52619-688f-5b59-ba5c-9e3e6c8b6368
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1788046437
-  updated_at: 1788046496
-  methods:
-  - GET
-  https_redirect_status_code: 426
-  strip_path: false
-  name: catalog-service-category-public
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - category
-  - catalog
-  snis: ~
-  service: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/catalog-service/(api/Category(?:/[0-9]+)?)$
-  id: b8387207-dc68-443d-99c4-909b1d635dc4
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1787873923
-  updated_at: 1788043809
-  methods:
-  - POST
-  - DELETE
-  - PUT
-  - GET
-  https_redirect_status_code: 426
-  strip_path: false
-  name: user-service-users
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - users
-  snis: ~
-  service: e7550091-15ce-5388-bc5d-2dc61442c715
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/user-service/(api/User/.+)
-  id: c5e8d0a5-0484-520e-83e9-d68ddaf9e8ee
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1788045697
-  updated_at: 1788046237
-  methods:
-  - POST
-  - PUT
-  - DELETE
-  https_redirect_status_code: 426
-  strip_path: false
-  name: catalog-service-game-no-public
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - game
-  - catalog
-  snis: ~
-  service: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/catalog-service/(api/Game(?:/[0-9]+)?)$
-  id: d3806ab5-d18e-42af-8fbe-495ae4ccf53d
-  regex_priority: 0
-- hosts: ~
-  protocols:
-  - http
-  - https
-  created_at: 1788044577
-  updated_at: 1788047015
-  methods:
-  - GET
-  https_redirect_status_code: 426
-  strip_path: false
-  name: catalog-service-game-public
-  request_buffering: true
-  response_buffering: true
-  tags:
-  - game
-  - catalog
-  snis: ~
-  service: b442c9eb-1714-421e-913b-a9b3d4ff4187
-  preserve_host: false
-  sources: ~
-  destinations: ~
-  path_handling: v1
-  headers: ~
-  paths:
-  - ~/catalog-service/(api/Game(?:/[0-9]+)?)$
-  id: e21a42c1-b74d-4016-beb8-f2baa5d13912
-  regex_priority: 0
-plugins:
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788045723
-  updated_at: 1788045723
-  consumer: ~
-  service: ~
-  enabled: true
-  route: d3806ab5-d18e-42af-8fbe-495ae4ccf53d
-  name: request-transformer
-  id: 09ee0339-df49-4e53-8fb1-44047971ed69
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788049345
-  updated_at: 1788049345
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 4d53bb97-3d57-4b19-ac57-4ea83f41a3ee
-  name: request-transformer
-  id: 1046ae72-8f72-495a-b72b-b7822071ed69
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788047320
-  updated_at: 1788047320
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 254cb0ae-f115-4c1f-b20e-e8f3d2232127
-  name: request-transformer
-  id: 2ad3c5e9-9dd9-4237-82e1-d7083676f1dd
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1787874394
-  updated_at: 1788043809
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 6aebcafd-c01b-43b4-8705-c90b48f7e9ef
-  name: request-transformer
-  id: 3358dc59-a6ae-4437-943e-7a2b058ce44d
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1787873923
-  updated_at: 1788043809
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 7d5622fc-aa81-5b78-a0a4-c9a0c680cad6
-  name: request-transformer
-  id: 3bfbd7cc-e2eb-5c31-b8e3-1ecf1db0b1ab
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1787873923
-  updated_at: 1788043809
-  consumer: ~
-  service: ~
-  enabled: true
-  route: c5e8d0a5-0484-520e-83e9-d68ddaf9e8ee
-  name: jwt
-  id: 3de2bf45-1616-53a5-9dd9-a4e96ba14380
-  config:
-    claims_to_verify:
-    - exp
-    run_on_preflight: true
-    maximum_expiration: 0
-    anonymous: ~
-    uri_param_names:
-    - jwt
-    cookie_names: []
-    key_claim_name: iss
-    secret_is_base64: false
-    header_names:
-    - Authorization
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788046483
-  updated_at: 1788046483
-  consumer: ~
-  service: ~
-  enabled: true
-  route: b8387207-dc68-443d-99c4-909b1d635dc4
-  name: request-transformer
-  id: 5fc22e0f-e070-4af5-bc70-551ceae0560c
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788046845
-  updated_at: 1788046845
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 056dd98a-cf6b-46e8-b11a-f448a508c5e0
-  name: request-transformer
-  id: 6898ed8f-b532-494d-a593-0a667ac5e4d7
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788045780
-  updated_at: 1788045780
-  consumer: ~
-  service: ~
-  enabled: true
-  route: d3806ab5-d18e-42af-8fbe-495ae4ccf53d
-  name: jwt
-  id: 828e039a-fc07-4d45-9309-1495ffd4cc80
-  config:
-    claims_to_verify:
-    - exp
-    run_on_preflight: true
-    maximum_expiration: 0
-    anonymous: ~
-    uri_param_names:
-    - jwt
-    cookie_names: []
-    key_claim_name: iss
-    secret_is_base64: false
-    header_names:
-    - authorization
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788050924
-  updated_at: 1788050924
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 6888e7e7-8ee0-40fc-b078-7cc69a69df78
-  name: request-transformer
-  id: 82f2b9a8-1e95-48a1-97c5-7b42414eac45
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788046832
-  updated_at: 1788046832
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 056dd98a-cf6b-46e8-b11a-f448a508c5e0
-  name: jwt
-  id: a9512a81-45ee-46ba-9a8d-5e3ebf54b6b0
-  config:
-    claims_to_verify:
-    - exp
-    run_on_preflight: true
-    maximum_expiration: 0
-    anonymous: ~
-    uri_param_names:
-    - jwt
-    cookie_names: []
-    key_claim_name: iss
-    secret_is_base64: false
-    header_names:
-    - authorization
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788049358
-  updated_at: 1788049358
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 4d53bb97-3d57-4b19-ac57-4ea83f41a3ee
-  name: jwt
-  id: bd5573cb-52f2-4545-86d3-188cb46d22ed
-  config:
-    claims_to_verify:
-    - exp
-    run_on_preflight: true
-    maximum_expiration: 0
-    anonymous: ~
-    uri_param_names:
-    - jwt
-    cookie_names: []
-    key_claim_name: iss
-    secret_is_base64: false
-    header_names:
-    - authorization
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788044592
-  updated_at: 1788044592
-  consumer: ~
-  service: ~
-  enabled: true
-  route: e21a42c1-b74d-4016-beb8-f2baa5d13912
-  name: request-transformer
-  id: cc51b09f-7740-49ba-bff4-34d2aef1221e
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788047458
-  updated_at: 1788047458
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 168b432c-befc-457e-8825-dd0a001b01b0
-  name: request-transformer
-  id: cf7fd736-eaf1-4b66-bb3a-32187cbdd67e
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1788047480
-  updated_at: 1788047480
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 168b432c-befc-457e-8825-dd0a001b01b0
-  name: jwt
-  id: dd203408-366e-496f-85f8-58c83b228730
-  config:
-    claims_to_verify:
-    - exp
-    run_on_preflight: true
-    maximum_expiration: 0
-    anonymous: ~
-    uri_param_names:
-    - jwt
-    cookie_names: []
-    key_claim_name: iss
-    secret_is_base64: false
-    header_names:
-    - authorization
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1787874746
-  updated_at: 1788043809
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 1a61dc66-33df-4a86-a6a5-7ee5fee286d9
-  name: request-transformer
-  id: e23a8929-089e-476a-a25d-9c1b183bb679
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1787873923
-  updated_at: 1788043809
-  consumer: ~
-  service: ~
-  enabled: true
-  route: a1a52619-688f-5b59-ba5c-9e3e6c8b6368
-  name: request-transformer
-  id: e8bdb6dc-a0ef-53df-98f5-14018d8e67e8
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1787873923
-  updated_at: 1788043809
-  consumer: ~
-  service: ~
-  enabled: true
-  route: c5e8d0a5-0484-520e-83e9-d68ddaf9e8ee
-  name: request-transformer
-  id: ed048453-5b02-5d95-9579-e889e46d0d6a
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-- instance_name: ~
-  tags: ~
-  protocols:
-  - grpc
-  - grpcs
-  - http
-  - https
-  created_at: 1787873923
-  updated_at: 1788043809
-  consumer: ~
-  service: ~
-  enabled: true
-  route: 52d29211-e096-5c64-a6b2-d8aabfa26deb
-  name: request-transformer
-  id: f25e4c03-fc1a-53e9-9b8c-0f48349121b2
-  config:
-    rename:
-      querystring: []
-      headers: []
-      body: []
-    remove:
-      querystring: []
-      headers: []
-      body: []
-    add:
-      querystring: []
-      headers: []
-      body: []
-    append:
-      querystring: []
-      headers: []
-      body: []
-    http_method: ~
-    replace:
-      headers: []
-      querystring: []
-      uri: /$(uri_captures[1])
-      body: []
-jwt_secrets:
-- tags: ~
-  created_at: 1787873923
-  consumer: 9db1398e-2c2e-5727-aaed-667525892374
-  secret: ChaveSuperSecretaECompridaDeExemplo123!
-  rsa_public_key: ~
-  key: FCGames
-  id: 5e9b6a28-bed7-4af5-8b6f-bcb4a2d6eef8
-  algorithm: HS256
