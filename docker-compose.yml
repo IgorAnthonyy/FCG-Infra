@@ -70,7 +70,7 @@ services:
       - fcg-network
 
   users:
-    image: drungas/fcgusers-monitoring:latest
+    image: igoranthony12/users-api:latest
     container_name: fcg-users
     ports:
       - "8081:8080"
@@ -81,7 +81,7 @@ services:
       - RabbitMQ__Username=fcg_user
       - RabbitMQ__Password=fcg_password
       - RabbitMQ__VirtualHost=/
-      - Jwt__Key=minha_chave_secreta_super_segura_de_desenvolvimento_com_mais_de_32_caracteres_12345
+      - Jwt__Key=ChaveSuperSecretaECompridaDeExemplo123!
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
     depends_on:
       fiapcloudgames:
@@ -128,7 +128,7 @@ services:
       - MongoDB__ConnectionString=mongodb://fcg_user:fcg_password@mongo:27017/fcg_catalog?authSource=admin
       - MongoDB__DatabaseName=fcg_catalog
       - MongoDB__ReviewsCollectionName=reviews
-      - Jwt__SigningKey=minha_chave_secreta_super_segura_de_desenvolvimento_com_mais_de_32_caracteres_12345
+      - Jwt__SigningKey=ChaveSuperSecretaECompridaDeExemplo123!
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
     depends_on:
       fiapcloudgames:
