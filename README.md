@@ -9,6 +9,14 @@ O projeto é composto por 5 microsserviços desenvolvidos em **.NET 10**:
 4. **CatalogWorkerService**: Worker de background para processamento de respostas de pagamentos e persistência de bibliotecas de jogos.
 5. **Notifications**: Worker de background para envio de notificações e e-mails transacionais (SMTP).
 
+## 📚 Documentação
+
+Os documentos gerais da solução ficam na pasta [`docs`](docs/):
+
+| Documento | Descrição |
+| --- | --- |
+| [Arquitetura de microsserviços](docs/arquitetura-microservicos.md) | Visão geral dos repositórios, responsabilidades, comunicação entre serviços, mensageria, bancos e diagramas Mermaid. |
+
 ---
 
 ## 🛠️ Tecnologias Utilizadas
@@ -111,6 +119,57 @@ O script `down.sh` remove os recursos na ordem inversa e realiza a limpeza compl
 3. Remove os jobs temporários (`kong-restore`, `kong-migrations`, `konga-prepare`).
 4. Remove o **PVC** do PostgreSQL do Kong (`kong-postgres-pvc`).
 5. Exibe um resumo dos recursos restantes no cluster.
+
+---
+
+## 📥 Clonando e Implantando os Microsserviços
+
+Além da infraestrutura compartilhada (deste repositório), cada microsserviço possui seu próprio repositório com uma pasta `k8s` contendo os manifestos (Deployment, ConfigMap, Secret e, quando aplicável, Service) necessários para colocá-lo em execução no cluster.
+
+> **Pré-requisito**: a infraestrutura compartilhada (PostgreSQL, RabbitMQ, Redis, MongoDB, etc.) já deve ter sido implantada com o `./deploy.sh` deste repositório antes de subir os microsserviços, pois eles dependem desses serviços para funcionar.
+
+### Repositórios dos Microsserviços
+
+| Microsserviço | Repositório |
+| :--- | :--- |
+| **Users** | [FIAP-Cloud-Games](https://github.com/IgorAnthonyy/FIAP-Cloud-Games.git) |
+| **Catalog** | [FCG-Catalog](https://github.com/SergioHMagalhaes/FCG-Catalog.git) |
+| **Payments** | [FCGPayments](https://github.com/pedrobarros01/FCGPayments.git) |
+| **CatalogWorkerService** | [FCGCatalogWorker](https://github.com/pedrobarros01/FCGCatalogWorker.git) |
+| **NotificationsAPI** | [FCG.NotificationsAPI](https://github.com/OtavioAndradeCR/FCG.NotificationsAPI.git) |
+| **NotificationWorker** | [FCGNotificationWorker](https://github.com/pedrobarros01/FCGNotificationWorker.git) |
+
+### Passo a Passo
+
+1. Clone cada repositório em um diretório de sua preferência:
+
+   ```bash
+   git clone https://github.com/IgorAnthonyy/FIAP-Cloud-Games.git
+   git clone https://github.com/SergioHMagalhaes/FCG-Catalog.git
+   git clone https://github.com/pedrobarros01/FCGPayments.git
+   git clone https://github.com/pedrobarros01/FCGCatalogWorker.git
+   git clone https://github.com/OtavioAndradeCR/FCG.NotificationsAPI.git
+   git clone https://github.com/pedrobarros01/FCGNotificationWorker.git
+   ```
+
+2. Para cada repositório clonado, execute o `kubectl apply` apontando para a respectiva pasta `k8s`:
+
+   ```bash
+   kubectl apply -f FIAP-Cloud-Games/k8s
+   kubectl apply -f FCG-Catalog/k8s
+   kubectl apply -f FCGPayments/k8s
+   kubectl apply -f FCGCatalogWorker/k8s
+   kubectl apply -f FCG.NotificationsAPI/k8s
+   kubectl apply -f FCGNotificationWorker/k8s
+   ```
+
+3. Acompanhe o rollout de cada Deployment (opcional):
+
+   ```bash
+   kubectl rollout status deployment/<nome-do-deployment>
+   ```
+
+> **Nota**: a ordem de aplicação entre os microsserviços não é relevante, desde que a infraestrutura compartilhada já esteja no ar. Cada pasta `k8s` é independente e pode ser aplicada isoladamente ou reaplicada a qualquer momento para atualizar os recursos.
 
 ---
 
