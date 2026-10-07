@@ -1,7 +1,7 @@
 name: Pipeline Infra
 
 on:
-  pull_request:
+  push:
     branches:
       - production
 
