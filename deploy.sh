@@ -6,6 +6,10 @@ echo "======================================"
 echo "Aplicando infraestrutura..."
 echo "======================================"
 
+echo "Aplicando storageclass"
+
+kubectl apply -f ./k8s/storageclass.yaml
+
 echo "Aplicando rabbitmq"
 
 kubectl apply -f ./k8s/rabbitmq
