@@ -8,12 +8,12 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+          AWS_REGION: ${{vars.AWS_REGION}}
+          CLUSTER_NAME: ${{vars.CLUSTER_NAME}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v4
       
       - name: Configurar Credenciais AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -26,3 +26,18 @@ jobs:
       - name: Testar Conexão AWS
         run: |
           aws sts get-caller-identity
+
+      - name: Conectar no cluster
+        run: |
+          aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+
+      - name: Testar Conexão com o Cluster
+        run: |
+          kubectl get nodes
+          kubectl get pods -A
+
+      - name: Deploy do FCG-Infra
+        run: |
+          chmod +x ./deploy.sh
+          ./deploy.sh
+          
