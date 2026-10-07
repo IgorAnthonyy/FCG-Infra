@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: kong
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: kong
 
