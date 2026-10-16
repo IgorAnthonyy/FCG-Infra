@@ -11,9 +11,10 @@ jobs:
     env:
           AWS_REGION: ${{vars.AWS_REGION}}
           CLUSTER_NAME: ${{vars.CLUSTER_NAME}}
+          NAMESPACE: fcg
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Configurar Credenciais AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -21,7 +22,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1 
+          aws-region: ${{env.AWS_REGION}}
       
       - name: Testar Conexão AWS
         run: |
@@ -36,8 +37,45 @@ jobs:
           kubectl get nodes
           kubectl get pods -A
 
-      - name: Deploy do FCG-Infra
+      - name: Criando namespace no Cluster
         run: |
-          chmod +x ./deploy.sh
-          ./deploy.sh
+          kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Aplicando storageclass
+        run: |
+          kubectl apply -f ./k8s/storageclass.yaml
+
+      - name: Aplicando rabbitmq
+        run: |
+          echo "Aplicando rabbitmq"
+          kubectl create secret generic rabbitmq-secret -n ${{ env.NAMESPACE }} \
+            --from-literal=rabbitmq-username=${{secrets.RABBITMQ_USERNAME}} \
+            --from-literal=rabbitmq-password=${{ secrets.RABBITMQ_PASSWORD }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f ./k8s/rabbitmq/configmap.yaml
+          kubectl apply -f ./k8s/rabbitmq/deployment.yaml
+          kubectl apply -f ./k8s/rabbitmq/service.yaml
+          echo "Aguardando rabbitmq ficar disponivel"
+          kubectl rollout status \
+          deployment/rabbitmq \
+          --timeout=120s
+          echo "Rabbitmq ficou disponivel"
+      - name: Aplicando postgres
+        run: |
+          echo "Aplicando postgres da aplicação"
+          kubectl create secret generic ostgres-secret -n ${{ env.NAMESPACE }} \
+            --from-literal=postgres-username=${{secrets.POSTGRES_USERNAME}} \
+            --from-literal=postgres-password=${{ secrets.POSTGRES_PASSWORD }} \
+            --from-literal=connection-string-users="${{ secrets.POSTGRES_CONNECTION_USER }}" \
+            --from-literal=connection-string-catalog="${{ secrets.POSTGRES_CONNECTION_CATALOG }}" \
+            --from-literal=connection-string-payments="${{ secrets.POSTGRES_PASSWORD }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f ./k8s/rabbitmq/configmap.yaml
+          kubectl apply -f ./k8s/rabbitmq/deployment.yaml
+          kubectl apply -f ./k8s/rabbitmq/service.yaml
+          echo "Aguardando postgres ficar disponivel"
+          kubectl rollout status \
+          deployment/postgres \
+          --timeout=120s
+          echo "Postgres ficou disponivel"
           
