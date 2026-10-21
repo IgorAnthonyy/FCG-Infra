@@ -68,7 +68,7 @@ jobs:
             --from-literal=postgres-password=${{ secrets.POSTGRES_PASSWORD }} \
             --from-literal=connection-string-users="${{ secrets.POSTGRES_CONNECTION_USER }}" \
             --from-literal=connection-string-catalog="${{ secrets.POSTGRES_CONNECTION_CATALOG }}" \
-            --from-literal=connection-string-payments="${{ secrets.POSTGRES_PASSWORD }}" \
+            --from-literal=connection-string-payments="${{ secrets.POSTGRES_CONNECTION_PAYMENTS }}" \
             --dry-run=client -o yaml | kubectl apply -f -
           kubectl apply -f ./k8s/postgres/deployment.yaml
           kubectl apply -f ./k8s/postgres/service.yaml
