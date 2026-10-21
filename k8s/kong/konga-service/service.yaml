@@ -7,7 +7,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     service.beta.kubernetes.io/aws-load-balancer-type: "external"
     service.beta.kubernetes.io/aws-load-balancer-inbound-cidrs: 0.0.0.0/0
-    service.beta.kubernetes.io/aws-load-balancer-subnets: subnet-05b402b2346368283, subnet-036a23c3be3fd551b, subnet-0d8fdafff200b5cab, subnet-00215c26f8227c0a4, subnet-08ff3132f2625d138,  subnet-0f945f49867ce6788
+    service.beta.kubernetes.io/aws-load-balancer-subnets: subnet-04988dd222a000fe4, subnet-01989752f5065a2e3, subnet-0fa34a5c31a5057d8, subnet-06743194a4c1d24e8, subnet-02d0d075eb535aae8
 
 spec:
   type: LoadBalancer
