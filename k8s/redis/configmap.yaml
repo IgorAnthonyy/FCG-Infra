@@ -2,6 +2,7 @@
 kind: ConfigMap
 metadata:
   name: redis-config
+  namespace: fcg
 data:
   redis.conf: |
     maxmemory 256mb

@@ -66,3 +66,4 @@ kubectl rollout status \
 echo "======================================"
 echo "Kong stack iniciado com sucesso!"
 echo "======================================"
+# ChaveSuperSecretaECompridaDeExemplo123!

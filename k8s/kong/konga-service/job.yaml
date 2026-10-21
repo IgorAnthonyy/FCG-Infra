@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: konga-prepare
+  namespace: fcg
 spec:
   backoffLimit: 5
   template:
