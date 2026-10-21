@@ -58,6 +58,7 @@ jobs:
           echo "Aguardando rabbitmq ficar disponivel"
           kubectl rollout status \
           deployment/rabbitmq \
+          --namespace="${{ env.NAMESPACE }}" \
           --timeout=120s
           echo "Rabbitmq ficou disponivel"
       - name: Aplicando postgres
@@ -75,6 +76,7 @@ jobs:
           echo "Aguardando postgres ficar disponivel"
           kubectl rollout status \
           deployment/postgres \
+          --namespace="${{ env.NAMESPACE }}" \
           --timeout=120s
           echo "Postgres ficou disponivel"
       - name: Aplicando postgres
@@ -89,6 +91,7 @@ jobs:
           echo "Aguardando postgres ficar disponivel"
           kubectl rollout status \
           deployment/redis \
+          --namespace="${{ env.NAMESPACE }}" \
           --timeout=120s
           echo "Redis ficou disponivel"
   
@@ -105,6 +108,7 @@ jobs:
           echo "Aguardando mongo ficar disponivel"
           kubectl rollout status \
           deployment/mongo \
+          --namespace="${{ env.NAMESPACE }}" \
           --timeout=120s
           echo "Mongo ficou disponivel"
           
@@ -116,6 +120,7 @@ jobs:
           echo "Aguardando prometheus ficar disponivel"
           kubectl rollout status \
           deployment/prometheus \
+          --namespace="${{ env.NAMESPACE }}" \
           --timeout=120s
           echo "Prometheus ficou disponivel"
 
@@ -143,68 +148,86 @@ jobs:
 
           kubectl rollout status \
             deployment/grafana \
+            --namespace="${{ env.NAMESPACE }}" \
             --timeout=120s
 
           echo "Grafana ficou disponivel"
 
       - name: Aplicando kong
         run: |
-          echo "Subindo kong da aplicação"
+          echo "Subindo Kong da aplicação"
           echo "======================================"
           echo "Aplicando infraestrutura..."
           echo "======================================"
-          kubectl create secret generic kong-secrets -n ${{ env.NAMESPACE }} \
-            --from-literal=KONG_DB_PASSWORD=${{secrets.KONG_DB_PASSWORD}} \
-            --from-literal=KONGA_TOKEN_SECRET=${{secrets.KONGA_TOKEN_SECRET}} \
-            --from-literal=JWT_SECRET=${{secrets.KONGA_JWT_TOKEN_SECRET}} \
-            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic kong-secrets \
+            -n "${{ env.NAMESPACE }}" \
+            --from-literal=KONG_DB_PASSWORD="${{ secrets.KONG_DB_PASSWORD }}" \
+            --from-literal=KONGA_TOKEN_SECRET="${{ secrets.KONGA_TOKEN_SECRET }}" \
+            --from-literal=JWT_SECRET="${{ secrets.KONGA_JWT_TOKEN_SECRET }}" \
+            --dry-run=client \
+            -o yaml | kubectl apply -f -
+
           kubectl apply -k ./k8s/kong
 
           echo "Parando Kong temporariamente..."
 
-          kubectl scale deployment/kong --replicas=0
+          kubectl scale deployment/kong \
+            -n "${{ env.NAMESPACE }}" \
+            --replicas=0
 
           echo "Removendo restore anterior..."
 
-          kubectl delete job kong-restore --ignore-not-found
+          kubectl delete job kong-restore \
+            -n "${{ env.NAMESPACE }}" \
+            --ignore-not-found
 
           echo "Aguardando PostgreSQL..."
 
           kubectl rollout status \
             deployment/kong-database \
+            -n "${{ env.NAMESPACE }}" \
             --timeout=120s
 
           echo "Aguardando Kong migrations..."
 
           kubectl wait \
+            -n "${{ env.NAMESPACE }}" \
             --for=condition=complete \
             job/kong-migrations \
             --timeout=180s
 
           echo "Criando Kong restore..."
 
-          kubectl apply -f ./k8s/kong/kong-service/restore-job.yaml
+          kubectl apply \
+            -n "${{ env.NAMESPACE }}" \
+            -f ./k8s/kong/kong-service/restore-job.yaml
 
           echo "Aguardando restore..."
 
           kubectl wait \
+            -n "${{ env.NAMESPACE }}" \
             --for=condition=complete \
             job/kong-restore \
             --timeout=180s
 
           echo "Iniciando Kong..."
 
-          kubectl scale deployment/kong --replicas=1
+          kubectl scale deployment/kong \
+            -n "${{ env.NAMESPACE }}" \
+            --replicas=1
 
           echo "Aguardando Kong..."
 
           kubectl rollout status \
             deployment/kong \
+            -n "${{ env.NAMESPACE }}" \
             --timeout=180s
 
           echo "Aguardando Konga prepare..."
 
           kubectl wait \
+            -n "${{ env.NAMESPACE }}" \
             --for=condition=complete \
             job/konga-prepare \
             --timeout=180s
@@ -213,6 +236,7 @@ jobs:
 
           kubectl rollout status \
             deployment/konga \
+            -n "${{ env.NAMESPACE }}" \
             --timeout=180s
 
           echo "======================================"
