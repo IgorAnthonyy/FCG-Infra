@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tempo
-  namespace: default
+  namespace: fcg
 spec:
   replicas: 1
   selector:

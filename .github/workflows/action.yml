@@ -11,9 +11,10 @@ jobs:
     env:
           AWS_REGION: ${{vars.AWS_REGION}}
           CLUSTER_NAME: ${{vars.CLUSTER_NAME}}
+          NAMESPACE: fcg
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Configurar Credenciais AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -21,7 +22,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1 
+          aws-region: ${{env.AWS_REGION}}
       
       - name: Testar Conexão AWS
         run: |
@@ -36,8 +37,184 @@ jobs:
           kubectl get nodes
           kubectl get pods -A
 
-      - name: Deploy do FCG-Infra
+      - name: Criando namespace no Cluster
         run: |
-          chmod +x ./deploy.sh
-          ./deploy.sh
+          kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Aplicando storageclass
+        run: |
+          kubectl apply -f ./k8s/storageclass.yaml
+
+      - name: Aplicando rabbitmq
+        run: |
+          echo "Aplicando rabbitmq"
+          kubectl create secret generic rabbitmq-secret -n ${{ env.NAMESPACE }} \
+            --from-literal=rabbitmq-username=${{secrets.RABBITMQ_USERNAME}} \
+            --from-literal=rabbitmq-password=${{ secrets.RABBITMQ_PASSWORD }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f ./k8s/rabbitmq/configmap.yaml
+          kubectl apply -f ./k8s/rabbitmq/deployment.yaml
+          kubectl apply -f ./k8s/rabbitmq/service.yaml
+          echo "Aguardando rabbitmq ficar disponivel"
+          kubectl rollout status \
+          deployment/rabbitmq \
+          --timeout=120s
+          echo "Rabbitmq ficou disponivel"
+      - name: Aplicando postgres
+        run: |
+          echo "Aplicando postgres da aplicação"
+          kubectl create secret generic postgres-secret -n ${{ env.NAMESPACE }} \
+            --from-literal=postgres-username=${{secrets.POSTGRES_USERNAME}} \
+            --from-literal=postgres-password=${{ secrets.POSTGRES_PASSWORD }} \
+            --from-literal=connection-string-users="${{ secrets.POSTGRES_CONNECTION_USER }}" \
+            --from-literal=connection-string-catalog="${{ secrets.POSTGRES_CONNECTION_CATALOG }}" \
+            --from-literal=connection-string-payments="${{ secrets.POSTGRES_CONNECTION_PAYMENTS }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f ./k8s/postgres/deployment.yaml
+          kubectl apply -f ./k8s/postgres/service.yaml
+          echo "Aguardando postgres ficar disponivel"
+          kubectl rollout status \
+          deployment/postgres \
+          --timeout=120s
+          echo "Postgres ficou disponivel"
+      - name: Aplicando postgres
+        run: |
+          echo "Aplicando redis da aplicação"
+          kubectl create secret generic redis-secret -n ${{ env.NAMESPACE }} \
+            --from-literal=redis-connection-string=${{secrets.REDIS_CONNECTION}} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f ./k8s/redis/configmap.yaml
+          kubectl apply -f ./k8s/redis/deployment.yaml
+          kubectl apply -f ./k8s/redis/service.yaml
+          echo "Aguardando postgres ficar disponivel"
+          kubectl rollout status \
+          deployment/redis \
+          --timeout=120s
+          echo "Redis ficou disponivel"
+  
+      - name: Aplicando mongo
+        run: |
+          echo "Aplicando mongo da aplicação"
+          kubectl create secret generic mongo-secret -n ${{ env.NAMESPACE }} \
+            --from-literal=mongo-username=${{secrets.MONGO_USERNAME}} \
+            --from-literal=mongo-password=${{secrets.MONGO_PASSWORD}} \
+            --from-literal=connection-string-catalog=${{secrets.MONGO_CONNECTION}} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f ./k8s/mongo/deployment.yaml
+          kubectl apply -f ./k8s/mongo/service.yaml
+          echo "Aguardando mongo ficar disponivel"
+          kubectl rollout status \
+          deployment/mongo \
+          --timeout=120s
+          echo "Mongo ficou disponivel"
           
+      - name: Aplicando prometheus
+        run: |
+          echo "Aplicando prometheus da aplicação"
+          kubectl apply -f ./k8s/prometheus/configmap.yaml
+          kubectl apply -f ./k8s/prometheus/deployment.yaml
+          echo "Aguardando prometheus ficar disponivel"
+          kubectl rollout status \
+          deployment/prometheus \
+          --timeout=120s
+          echo "Prometheus ficou disponivel"
+
+      - name: Aplicando tempo
+        run: |
+          echo "Aplicando tempo da aplicação"
+          kubectl apply -f ./k8s/tempo --validate=false
+          echo "Tempo ficou disponivel"
+
+      - name: Aplicando logs
+        run: |
+          echo "Aplicando logs da aplicação"
+          kubectl apply -f ./k8s/logs --validate=false
+          echo "Logs ficou disponivel"
+
+      - name: Aplicando grafana
+        run: |
+          echo "Aplicando grafana da aplicação"
+          kubectl create secret generic grafana-secret -n ${{ env.NAMESPACE }} \
+            --from-literal=grafana-username=${{secrets.GRAFANA_USERNAME}} \
+            --from-literal=grafana-password=${{secrets.GRAFANA_PASSWORD}} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -k ./k8s/grafana --validate=false
+          echo "Aguardando grafana ficar disponivel"
+
+          kubectl rollout status \
+            deployment/grafana \
+            --timeout=120s
+
+          echo "Grafana ficou disponivel"
+
+      - name: Aplicando kong
+        run: |
+          echo "Subindo kong da aplicação"
+          echo "======================================"
+          echo "Aplicando infraestrutura..."
+          echo "======================================"
+          kubectl create secret generic kong-secrets -n ${{ env.NAMESPACE }} \
+            --from-literal=KONG_DB_PASSWORD=${{secrets.KONG_DB_PASSWORD}} \
+            --from-literal=KONGA_TOKEN_SECRET=${{secrets.KONGA_TOKEN_SECRET}} \
+            --from-literal=JWT_SECRET=${{secrets.KONGA_JWT_TOKEN_SECRET}} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -k ./k8s/kong
+
+          echo "Parando Kong temporariamente..."
+
+          kubectl scale deployment/kong --replicas=0
+
+          echo "Removendo restore anterior..."
+
+          kubectl delete job kong-restore --ignore-not-found
+
+          echo "Aguardando PostgreSQL..."
+
+          kubectl rollout status \
+            deployment/kong-database \
+            --timeout=120s
+
+          echo "Aguardando Kong migrations..."
+
+          kubectl wait \
+            --for=condition=complete \
+            job/kong-migrations \
+            --timeout=180s
+
+          echo "Criando Kong restore..."
+
+          kubectl apply -f ./k8s/kong/kong-service/restore-job.yaml
+
+          echo "Aguardando restore..."
+
+          kubectl wait \
+            --for=condition=complete \
+            job/kong-restore \
+            --timeout=180s
+
+          echo "Iniciando Kong..."
+
+          kubectl scale deployment/kong --replicas=1
+
+          echo "Aguardando Kong..."
+
+          kubectl rollout status \
+            deployment/kong \
+            --timeout=180s
+
+          echo "Aguardando Konga prepare..."
+
+          kubectl wait \
+            --for=condition=complete \
+            job/konga-prepare \
+            --timeout=180s
+
+          echo "Aguardando Konga..."
+
+          kubectl rollout status \
+            deployment/konga \
+            --timeout=180s
+
+          echo "======================================"
+          echo "Kong stack iniciado com sucesso!"
+          echo "======================================"

@@ -2,7 +2,8 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: kong-restore
-  namespace: default
+  namespace: fcg
+
 spec:
   backoffLimit: 5
 
@@ -14,9 +15,74 @@ spec:
     spec:
       restartPolicy: OnFailure
 
+      initContainers:
+        - name: render-kong-backup
+          image: python:3.12-alpine
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: kong-secrets
+                  key: JWT_SECRET
+
+          command:
+            - python
+            - -c
+
+          args:
+            - |
+              import os
+              from pathlib import Path
+
+              source = Path("/backup-template/kong-backup.yaml")
+              destination = Path("/backup/kong-backup.yaml")
+
+              placeholder = "${JWT_SECRET}"
+              jwt_secret = os.environ.get("JWT_SECRET")
+
+              if not jwt_secret:
+                  raise RuntimeError(
+                      "A variável JWT_SECRET não foi encontrada ou está vazia."
+                  )
+
+              if not source.exists():
+                  raise RuntimeError(
+                      "O arquivo /backup-template/kong-backup.yaml não foi encontrado."
+                  )
+
+              content = source.read_text(encoding="utf-8")
+
+              if placeholder not in content:
+                  raise RuntimeError(
+                      "O placeholder ${JWT_SECRET} não foi encontrado no backup."
+                  )
+
+              rendered_content = content.replace(
+                  placeholder,
+                  jwt_secret
+              )
+
+              destination.write_text(
+                  rendered_content,
+                  encoding="utf-8"
+              )
+
+              print("Backup do Kong processado com sucesso.")
+
+          volumeMounts:
+            - name: kong-backup-template
+              mountPath: /backup-template
+              readOnly: true
+
+            - name: kong-backup-rendered
+              mountPath: /backup
+
       containers:
         - name: kong-restore
           image: kong:3.4
+          imagePullPolicy: IfNotPresent
 
           env:
             - name: KONG_DATABASE
@@ -59,7 +125,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              set -e
+              set -eu
 
               echo "======================================"
               echo "Kong Restore"
@@ -73,13 +139,15 @@ spec:
               done
 
               echo "Banco do Kong disponível."
-
               echo "Verificando se já existe configuração..."
 
-              SERVICE_COUNT=$(kong config db_export /tmp/current.yaml >/dev/null 2>&1 && \
-                grep -c "^  - name:" /tmp/current.yaml || true)
+              SERVICE_COUNT=$(
+                kong config db_export /tmp/current.yaml > /dev/null 2>&1 &&
+                grep -c "^  - name:" /tmp/current.yaml ||
+                true
+              )
 
-              if [ "$SERVICE_COUNT" -gt 0 ]; then
+              if [ "${SERVICE_COUNT:-0}" -gt 0 ]; then
                 echo "Configuração existente encontrada."
                 echo "Backup NÃO será restaurado."
 
@@ -93,12 +161,16 @@ spec:
               echo "Banco sem Services."
               echo "Restaurando backup..."
 
+              if [ ! -f /backup/kong-backup.yaml ]; then
+                echo "ERRO: arquivo processado não encontrado."
+                exit 1
+              fi
+
               echo "Validando backup..."
 
               kong config parse /backup/kong-backup.yaml
 
               echo "Backup válido."
-
               echo "Importando configuração..."
 
               kong config db_import /backup/kong-backup.yaml
@@ -108,11 +180,15 @@ spec:
               echo "======================================"
 
           volumeMounts:
-            - name: kong-backup
+            - name: kong-backup-rendered
               mountPath: /backup
               readOnly: true
 
       volumes:
-        - name: kong-backup
+        - name: kong-backup-template
           configMap:
             name: kong-backup
+
+        - name: kong-backup-rendered
+          emptyDir:
+            medium: Memory

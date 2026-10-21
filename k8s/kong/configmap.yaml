@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kong-config
-  namespace: default
+  namespace: fcg
 data:
   KONG_DB_NAME: kong
   KONG_DB_USERNAME: kong

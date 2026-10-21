@@ -1270,6 +1270,6 @@ jwt_secrets:
   tags: ~
   consumer: 9db1398e-2c2e-5727-aaed-667525892374
   id: 5e9b6a28-bed7-4af5-8b6f-bcb4a2d6eef8
-  secret: ChaveSuperSecretaECompridaDeExemplo123!
+  secret: ${JWT_SECRET}
   rsa_public_key: ~
   created_at: 1787873923
