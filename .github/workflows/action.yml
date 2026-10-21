@@ -156,6 +156,7 @@ jobs:
           kubectl create secret generic kong-secrets -n ${{ env.NAMESPACE }} \
             --from-literal=KONG_DB_PASSWORD=${{secrets.KONG_DB_PASSWORD}} \
             --from-literal=KONGA_TOKEN_SECRET=${{secrets.KONGA_TOKEN_SECRET}} \
+            --from-literal=JWT_SECRET=${{secrets.KONGA_JWT_TOKEN_SECRET}} \
             --dry-run=client -o yaml | kubectl apply -f -
           kubectl apply -k ./k8s/kong
 

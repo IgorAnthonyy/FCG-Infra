@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: kong-migrations
+  namespace: fcg
 spec:
   backoffLimit: 10
   template:
