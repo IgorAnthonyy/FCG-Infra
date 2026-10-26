@@ -242,3 +242,9 @@ jobs:
           echo "======================================"
           echo "Kong stack iniciado com sucesso!"
           echo "======================================"
+
+      - name: Aplicando ingress
+        run: |
+          echo "Aplicando ingress da aplicação"
+          kubectl apply -f ./k8s/ingress/ingress.yaml
+          echo "Ingress aplicado"

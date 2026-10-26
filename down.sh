@@ -86,29 +86,29 @@ kubectl delete -k ./k8s/kong || true
 echo ""
 echo "2. Removendo Kong Restore Job..."
 
-if kubectl get job kong-restore >/dev/null 2>&1; then
-    kubectl delete job kong-restore
+if kubectl get job kong-restore -n fcg >/dev/null 2>&1; then
+    kubectl delete job kong-restore -n fcg
 fi
 
 echo ""
 echo "3. Removendo Kong Migrations Job..."
 
-if kubectl get job kong-migrations >/dev/null 2>&1; then
-    kubectl delete job kong-migrations
+if kubectl get job kong-migrations -n fcg >/dev/null 2>&1; then
+    kubectl delete job kong-migrations -n fcg
 fi
 
 echo ""
 echo "4. Removendo Konga Prepare Job..."
 
-if kubectl get job konga-prepare >/dev/null 2>&1; then
-    kubectl delete job konga-prepare
+if kubectl get job konga-prepare -n fcg >/dev/null 2>&1; then
+    kubectl delete job konga-prepare -n fcg
 fi
 
 echo ""
 echo "5. Removendo PVC do PostgreSQL..."
 
-if kubectl get pvc kong-postgres-pvc >/dev/null 2>&1; then
-    kubectl delete pvc kong-postgres-pvc
+if kubectl get pvc kong-postgres-pvc -n fcg >/dev/null 2>&1; then
+    kubectl delete pvc kong-postgres-pvc -n fcg
 fi
 
 echo ""
@@ -123,23 +123,23 @@ echo "======================================"
 
 echo ""
 echo "Pods:"
-kubectl get pods
+kubectl get pods -n fcg
 
 echo ""
 echo "Deployments:"
-kubectl get deployments
+kubectl get deployments -n fcg
 
 echo ""
 echo "Services:"
-kubectl get services
+kubectl get services -n fcg
 
 echo ""
 echo "Jobs:"
-kubectl get jobs
+kubectl get jobs -n fcg
 
 echo ""
 echo "PVCs:"
-kubectl get pvc
+kubectl get pvc -n fcg
 
 echo ""
 echo "======================================"

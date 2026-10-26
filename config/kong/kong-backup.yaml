@@ -25,7 +25,7 @@ services:
     name: catalog-service-category-no-public
     path_handling: v1
     paths:
-    - ~/catalog-service/(api/Category(?:/[0-9]+)?)$
+    - ~/(api/Category(?:/[0-9]+)?)$
     plugins:
     - config:
         anonymous: null
@@ -94,7 +94,7 @@ services:
     name: catalog-service-category-public
     path_handling: v1
     paths:
-    - ~/catalog-service/(api/Category(?:/[0-9]+)?)$
+    - ~/(api/Category(?:/[0-9]+)?)$
     plugins:
     - config:
         add:
@@ -145,7 +145,7 @@ services:
     name: catalog-service-game-no-public
     path_handling: v1
     paths:
-    - ~/catalog-service/(api/Game(?:/[0-9]+)?)$
+    - ~/(api/Game(?:/[0-9]+)?)$
     plugins:
     - config:
         anonymous: null
@@ -214,7 +214,7 @@ services:
     name: catalog-service-game-order-no-public
     path_handling: v1
     paths:
-    - ~/catalog-service/(api/GameOrders(?:/[0-9]+)?)$
+    - ~/(api/GameOrders(?:/[0-9]+)?)$
     plugins:
     - config:
         anonymous: null
@@ -283,7 +283,7 @@ services:
     name: catalog-service-game-order-public
     path_handling: v1
     paths:
-    - ~/catalog-service/(api/GameOrders(?:/[0-9]+)?)$
+    - ~/(api/GameOrders(?:/[0-9]+)?)$
     plugins:
     - config:
         add:
@@ -332,7 +332,7 @@ services:
     name: catalog-service-game-public
     path_handling: v1
     paths:
-    - ~/catalog-service/(api/Game(?:/[0-9]+)?)$
+    - ~/(api/Game(?:/[0-9]+)?)$
     plugins:
     - config:
         add:
@@ -381,7 +381,7 @@ services:
     name: catalog-service-health
     path_handling: v1
     paths:
-    - ~/catalog-service/(Health)
+    - ~/(Health)
     plugins:
     - config:
         add:
@@ -430,7 +430,7 @@ services:
     name: catalog-service-library-no-public
     path_handling: v1
     paths:
-    - ~/catalog-service/(api/Library)
+    - ~/(api/Library)
     plugins:
     - config:
         anonymous: null
@@ -499,7 +499,7 @@ services:
     name: catalog-service-metrics
     path_handling: v1
     paths:
-    - ~/catalog-service/(metrics)
+    - ~/(metrics)
     plugins:
     - config:
         add:
@@ -550,7 +550,7 @@ services:
     name: catalog-service-reviews-no-public
     path_handling: v1
     paths:
-    - ~/catalog-service/(api/Reviews(?:/[^/]+)*)/?$
+    - ~/(api/Reviews(?:/[^/]+)*)/?$
     plugins:
     - config:
         anonymous: null
@@ -619,7 +619,7 @@ services:
     name: catalog-service-reviews-public
     path_handling: v1
     paths:
-    - ~/catalog-service/(api/Reviews(?:/[^/]+)*)/?$
+    - ~/(api/Reviews(?:/[^/]+)*)/?$
     plugins:
     - config:
         add:
@@ -678,7 +678,7 @@ services:
     name: user-service-create-public-user
     path_handling: v1
     paths:
-    - ~/user-service/(api/User)$
+    - ~/(api/User)$
     plugins:
     - config:
         add:
@@ -726,7 +726,7 @@ services:
     name: user-service-health
     path_handling: v1
     paths:
-    - ~/user-service/(Health)
+    - ~/(Health)
     plugins:
     - config:
         add:
@@ -775,7 +775,7 @@ services:
     name: user-service-login
     path_handling: v1
     paths:
-    - ~/user-service/(api/Access.*)
+    - ~/(api/Access.*)
     plugins:
     - config:
         add:
@@ -823,7 +823,7 @@ services:
     name: user-service-metrics
     path_handling: v1
     paths:
-    - ~/user-service/(metrics)
+    - ~/(metrics)
     plugins:
     - config:
         add:
@@ -875,7 +875,7 @@ services:
     name: user-service-users
     path_handling: v1
     paths:
-    - ~/user-service/(api/User/.+)
+    - ~/(api/User/.+)
     plugins:
     - config:
         anonymous: null

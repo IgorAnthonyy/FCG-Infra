@@ -6,6 +6,10 @@ echo "======================================"
 echo "Aplicando infraestrutura..."
 echo "======================================"
 
+echo "Garantindo namespace fcg"
+
+kubectl apply -f ./k8s/namespace.yaml
+
 echo "Aplicando storageclass"
 
 kubectl apply -f ./k8s/storageclass.yaml
@@ -18,6 +22,7 @@ echo "Aguardando rabbitmq ficar disponivel"
 
 kubectl rollout status \
   deployment/rabbitmq \
+  -n fcg \
   --timeout=120s
 
 echo "Rabbitmq ficou disponivel"
@@ -31,6 +36,7 @@ echo "Aguardando postgres ficar disponivel"
 
 kubectl rollout status \
   deployment/postgres \
+  -n fcg \
   --timeout=120s
 
 echo "Postgres ficou disponivel"
@@ -43,6 +49,7 @@ echo "Aguardando redis ficar disponivel"
 
 kubectl rollout status \
   deployment/redis \
+  -n fcg \
   --timeout=120s
 
 echo "Redis ficou disponivel"
@@ -55,6 +62,7 @@ echo "Aguardando mongo ficar disponivel"
 
 kubectl rollout status \
   deployment/mongo \
+  -n fcg \
   --timeout=120s
 
 echo "Mongo ficou disponivel"
@@ -70,6 +78,7 @@ echo "Aguardando prometheus ficar disponivel"
 
 kubectl rollout status \
   deployment/prometheus \
+  -n fcg \
   --timeout=120s
 
 echo "Prometheus ficou disponivel"
@@ -83,6 +92,7 @@ echo "Aguardando tempo ficar disponivel"
 
 kubectl rollout status \
   deployment/tempo \
+  -n fcg \
   --timeout=120s
 
 echo "Tempo ficou disponivel"
@@ -105,6 +115,7 @@ echo "Aguardando grafana ficar disponivel"
 
 kubectl rollout status \
   deployment/grafana \
+  -n fcg \
   --timeout=120s
 
 echo "Grafana ficou disponivel"
@@ -121,16 +132,17 @@ kubectl apply -k ./k8s/kong
 
 echo "Parando Kong temporariamente..."
 
-kubectl scale deployment/kong --replicas=0
+kubectl scale deployment/kong -n fcg --replicas=0
 
 echo "Removendo restore anterior..."
 
-kubectl delete job kong-restore --ignore-not-found
+kubectl delete job kong-restore -n fcg --ignore-not-found
 
 echo "Aguardando PostgreSQL..."
 
 kubectl rollout status \
   deployment/kong-database \
+  -n fcg \
   --timeout=120s
 
 echo "Aguardando Kong migrations..."
@@ -138,6 +150,7 @@ echo "Aguardando Kong migrations..."
 kubectl wait \
   --for=condition=complete \
   job/kong-migrations \
+  -n fcg \
   --timeout=180s
 
 echo "Criando Kong restore..."
@@ -149,16 +162,18 @@ echo "Aguardando restore..."
 kubectl wait \
   --for=condition=complete \
   job/kong-restore \
+  -n fcg \
   --timeout=180s
 
 echo "Iniciando Kong..."
 
-kubectl scale deployment/kong --replicas=1
+kubectl scale deployment/kong -n fcg --replicas=1
 
 echo "Aguardando Kong..."
 
 kubectl rollout status \
   deployment/kong \
+  -n fcg \
   --timeout=180s
 
 echo "Aguardando Konga prepare..."
@@ -166,12 +181,14 @@ echo "Aguardando Konga prepare..."
 kubectl wait \
   --for=condition=complete \
   job/konga-prepare \
+  -n fcg \
   --timeout=180s
 
 echo "Aguardando Konga..."
 
 kubectl rollout status \
   deployment/konga \
+  -n fcg \
   --timeout=180s
 
 echo "======================================"

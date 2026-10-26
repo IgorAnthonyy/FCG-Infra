@@ -3,15 +3,8 @@ kind: Service
 metadata:
   name: konga
   namespace: fcg
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-    service.beta.kubernetes.io/aws-load-balancer-type: "external"
-    service.beta.kubernetes.io/aws-load-balancer-inbound-cidrs: 0.0.0.0/0
-    service.beta.kubernetes.io/aws-load-balancer-subnets: subnet-04988dd222a000fe4, subnet-01989752f5065a2e3, subnet-0fa34a5c31a5057d8, subnet-06743194a4c1d24e8, subnet-02d0d075eb535aae8
-
 spec:
-  type: LoadBalancer
-  loadBalancerClass: eks.amazonaws.com/nlb
+  type: ClusterIP
   selector:
     app: konga
   ports:

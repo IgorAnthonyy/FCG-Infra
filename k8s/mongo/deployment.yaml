@@ -38,15 +38,17 @@ spec:
         - name: mongo-data
           mountPath: /data/db
         livenessProbe:
-          exec:
-            command: ["mongosh", "-u", "fcg_user", "-p", "fcg_password", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
-          initialDelaySeconds: 15
+          tcpSocket:
+            port: 27017
+          initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
         readinessProbe:
-          exec:
-            command: ["mongosh", "-u", "fcg_user", "-p", "fcg_password", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+          tcpSocket:
+            port: 27017
           initialDelaySeconds: 15
           periodSeconds: 10
+          timeoutSeconds: 5
       volumes:
       - name: mongo-data
         emptyDir: {}

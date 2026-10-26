@@ -185,6 +185,15 @@ services:
     networks:
       - fcg-network
 
+  frontend:
+    image: igoranthony12/fcg-frontend:latest
+    container_name: fcg-frontend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    networks:
+      - fcg-network
+
   # ============================================================
   # Observabilidade (traduzido de k8s/)
   # ============================================================
