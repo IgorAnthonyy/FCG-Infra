@@ -111,7 +111,19 @@ jobs:
           --namespace="${{ env.NAMESPACE }}" \
           --timeout=120s
           echo "Mongo ficou disponivel"
-          
+
+      - name: Aplicando elasticsearch
+        run: |
+          echo "Aplicando elasticsearch da aplicação"
+          kubectl apply -f ./k8s/elasticsearch/deployment.yaml
+          kubectl apply -f ./k8s/elasticsearch/service.yaml
+          echo "Aguardando elasticsearch ficar disponivel"
+          kubectl rollout status \
+          deployment/elasticsearch \
+          --namespace="${{ env.NAMESPACE }}" \
+          --timeout=300s
+          echo "Elasticsearch ficou disponivel"
+
       - name: Aplicando prometheus
         run: |
           echo "Aplicando prometheus da aplicação"

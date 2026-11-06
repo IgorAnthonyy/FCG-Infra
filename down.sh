@@ -38,6 +38,14 @@ echo "Mongo desceu"
 
 echo "======================================"
 
+echo "Descendo elasticsearch..."
+
+kubectl delete -f ./k8s/elasticsearch/
+
+echo "Elasticsearch desceu"
+
+echo "======================================"
+
 echo "Descendo tempo..."
 
 kubectl delete -f ./k8s/tempo/
