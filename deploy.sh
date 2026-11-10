@@ -67,6 +67,19 @@ kubectl rollout status \
 
 echo "Mongo ficou disponivel"
 
+echo "======================================"
+echo "Aplicando elasticsearch da aplicação"
+
+kubectl apply -f ./k8s/elasticsearch
+
+echo "Aguardando elasticsearch ficar disponivel"
+
+kubectl rollout status \
+  deployment/elasticsearch \
+  --timeout=300s
+
+echo "Elasticsearch ficou disponivel"
+
 
 echo "======================================"
 echo "Aplicando prometheus da aplicação"
