@@ -4,7 +4,7 @@ metadata:
   name: kong
   namespace: fcg
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: kong
 

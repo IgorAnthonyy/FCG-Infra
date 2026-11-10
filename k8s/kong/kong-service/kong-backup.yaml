@@ -73,7 +73,7 @@ routes:
   created_at: 1788046773
   strip_path: false
   paths:
-  - ~/catalog-service/(api/Category(?:/[0-9]+)?)$
+  - ~/(api/Category(?:/[0-9]+)?)$
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -100,7 +100,7 @@ routes:
   created_at: 1788047433
   strip_path: false
   paths:
-  - ~/catalog-service/(api/GameOrders(?:/[0-9]+)?)$
+  - ~/(api/GameOrders(?:/[0-9]+)?)$
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -127,7 +127,7 @@ routes:
   created_at: 1787874617
   strip_path: false
   paths:
-  - ~/catalog-service/(Health)
+  - ~/(Health)
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -154,7 +154,7 @@ routes:
   created_at: 1788047226
   strip_path: false
   paths:
-  - ~/catalog-service/(api/GameOrders(?:/[0-9]+)?)$
+  - ~/(api/GameOrders(?:/[0-9]+)?)$
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -181,7 +181,7 @@ routes:
   created_at: 1788049297
   strip_path: false
   paths:
-  - ~/catalog-service/(api/Library)
+  - ~/(api/Library)
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -207,7 +207,7 @@ routes:
   created_at: 1787873923
   strip_path: false
   paths:
-  - ~/user-service/(api/User)$
+  - ~/(api/User)$
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -236,7 +236,7 @@ routes:
   created_at: 1788456485
   strip_path: false
   paths:
-  - ~/catalog-service/(api/Reviews(?:/[^/]+)*)/?$
+  - ~/(api/Reviews(?:/[^/]+)*)/?$
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -263,7 +263,7 @@ routes:
   created_at: 1788050903
   strip_path: false
   paths:
-  - ~/user-service/(Health)
+  - ~/(Health)
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -290,7 +290,7 @@ routes:
   created_at: 1787874372
   strip_path: false
   paths:
-  - ~/catalog-service/(metrics)
+  - ~/(metrics)
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -317,7 +317,7 @@ routes:
   created_at: 1787873923
   strip_path: false
   paths:
-  - ~/user-service/(metrics)
+  - ~/(metrics)
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -343,7 +343,7 @@ routes:
   created_at: 1787873923
   strip_path: false
   paths:
-  - ~/user-service/(api/Access.*)
+  - ~/(api/Access.*)
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -370,7 +370,7 @@ routes:
   created_at: 1788455816
   strip_path: false
   paths:
-  - ~/catalog-service/(api/Reviews(?:/[^/]+)*)/?$
+  - ~/(api/Reviews(?:/[^/]+)*)/?$
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -397,7 +397,7 @@ routes:
   created_at: 1788046437
   strip_path: false
   paths:
-  - ~/catalog-service/(api/Category(?:/[0-9]+)?)$
+  - ~/(api/Category(?:/[0-9]+)?)$
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -426,7 +426,7 @@ routes:
   created_at: 1787873923
   strip_path: false
   paths:
-  - ~/user-service/(api/User/.+)
+  - ~/(api/User/.+)
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -455,7 +455,7 @@ routes:
   created_at: 1788045697
   strip_path: false
   paths:
-  - ~/catalog-service/(api/Game(?:/[0-9]+)?)$
+  - ~/(api/Game(?:/[0-9]+)?)$
   request_buffering: true
   hosts: ~
   response_buffering: true
@@ -482,7 +482,7 @@ routes:
   created_at: 1788044577
   strip_path: false
   paths:
-  - ~/catalog-service/(api/Game(?:/[0-9]+)?)$
+  - ~/(api/Game(?:/[0-9]+)?)$
   request_buffering: true
   hosts: ~
   response_buffering: true
