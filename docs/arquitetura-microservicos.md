@@ -15,7 +15,7 @@ A plataforma simula uma loja de jogos digitais. Usuários se cadastram e autenti
 | **FCG.NotificationsAPI** | Função AWS Lambda de notificações. Triggerada por filas Amazon SQS, persiste no DynamoDB e envia e-mails transacionais via SMTP. | [README](https://github.com/OtavioAndradeCR/FCG.NotificationsAPI/blob/master/README.md) |
 | **FCGNotificationWorker** | Worker ponte RabbitMQ → Amazon SQS. Consome as filas de eventos do RabbitMQ e replica cada mensagem para a fila SQS correspondente, disparando a Lambda de notificações. | [README](https://github.com/pedrobarros01/FCGNotificationWorker/blob/master/README.md) |
 | **FCG-Shared** | Biblioteca compartilhada com contratos de eventos usados pelos microsserviços. No Users API, entra como submódulo em `src/submodule/FCG.Shared`. | [README](https://github.com/IgorAnthonyy/FCG-Shared/blob/main/README.md) |
-| **FCG-Infra** | Infraestrutura e orquestração local com Docker Compose, RabbitMQ, PostgreSQL e manifestos Kubernetes. | [README](https://github.com/IgorAnthonyy/FCG-Infra/blob/production/README.md) |
+| **FCG-Infra** | Infraestrutura e orquestração local com Docker Compose, RabbitMQ, PostgreSQL e manifestos Kubernetes. Também concentra a infraestrutura na AWS (cluster Kubernetes, repositórios privados de imagens Docker e pipelines de CI/CD). | [README](https://github.com/IgorAnthonyy/FCG-Infra/blob/production/README.md) |
 
 Links dos repositórios no GitHub:
 
@@ -148,6 +148,8 @@ No repositório `FIAP-Cloud-Games`, ela é referenciada como submódulo Git em `
 
 Repositório de apoio para subir a solução completa. Contém Docker Compose com PostgreSQL, RabbitMQ e imagens dos serviços, além de manifestos Kubernetes para infraestrutura compartilhada.
 
+Além do ambiente local, é também o repositório que concentra a infraestrutura na **AWS**: o cluster **Kubernetes é hospedado na AWS**, as imagens Docker dos serviços são publicadas em **repositórios privados da AWS** (Amazon ECR) e o build/deploy de cada serviço é automatizado por **pipelines de CI/CD**.
+
 ## Comunicação entre microsserviços
 
 A comunicação síncrona fica limitada às chamadas do cliente para as APIs HTTP. Entre microsserviços, a integração principal é assíncrona, orientada a eventos.
@@ -277,6 +279,16 @@ Credenciais padrão do compose principal:
 | RabbitMQ | `fcg_user` | `fcg_password` |
 | PostgreSQL | `fcg_user` | `fcg_password` |
 
+## Infraestrutura na AWS
+
+Além do ambiente local via Docker Compose, a solução é hospedada na **AWS**:
+
+- **Kubernetes**: o cluster que orquestra os serviços em produção é hospedado na AWS (via manifestos mantidos no FCG-Infra).
+- **Repositórios privados de imagens Docker**: as imagens Docker de cada microsserviço são publicadas em repositórios privados na AWS (Amazon ECR), em vez de um registry público.
+- **Pipelines de CI/CD**: cada serviço possui pipelines que automatizam o build da imagem, o push para o repositório privado na AWS e o deploy no cluster Kubernetes.
+
+Isso é adicional ao uso de **AWS Lambda**, **Amazon SQS** e **DynamoDB** pelo serviço de Notificações, já descrito nas seções anteriores.
+
 ## Bancos de dados
 
 Embora a infraestrutura local use uma instância PostgreSQL compartilhada, cada microsserviço trabalha com um banco lógico próprio. Além do PostgreSQL, o Catalog API usa MongoDB e Redis como stores adicionais, e o serviço de Notificações usa DynamoDB na AWS:
@@ -323,7 +335,9 @@ flowchart LR
 - MassTransit
 - JWT Bearer
 - Docker e Docker Compose
-- Kubernetes
+- Kubernetes (hospedado na AWS)
+- Amazon ECR (repositórios privados de imagens Docker)
+- Pipelines de CI/CD
 - xUnit
 
 ## Como navegar pela documentação
